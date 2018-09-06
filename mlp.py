@@ -40,7 +40,7 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
     final = []
     count = 0
     while count < int(number_of_nodes):
-        arr = np.ones(int(number_of_features))
+        arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_features))
         first_layer.append(arr)
         count += 1
     final.append(first_layer)
@@ -49,14 +49,14 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
     # are connected to input nodes and output nodes respectively
     for layer_count in range(0, int(number_of_layers)-2):
         for node_count in range(0,int(number_of_nodes)):
-            arr = np.ones(int(number_of_nodes))
+            arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
             node.append(arr)
         layer.append(node)
     final.append(layer)
     #The last hidden layer connected to an output layer
     count = 0
     while count < int(number_of_nodes):
-        arr = np.ones(int(number_of_classes))
+        arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_classes))
         last_layer.append(arr)
         count += 1
     final.append(last_layer)
