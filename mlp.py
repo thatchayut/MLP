@@ -24,8 +24,14 @@ def getInput():
         if ((function is  "1") or (function is  "2")):
             check = True
         else:
-            print("Invalid function number !")  
-    return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes
+            print("Invalid function number !") 
+    number_of_classes = input("Learning rate : ")
+    type(learning_rate)
+    number_of_classes = input("Momentum : ")
+    type(momentum) 
+    return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes,
+           learning_rate, momentum
+
 
 def createInputNodes(number_of_features):
     arr_input_nodes = np.zeros(int(number_of_features))
