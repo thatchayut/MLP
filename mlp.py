@@ -74,26 +74,25 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
 
 def createBias(number_of_nodes,number_of_layers):
     weight_bias = []
-    node = []
-    layer = []
+    node1 = []
+    layer1 = []
+    node2 = []
+    layer2 =[]
     bias = []
     #initial weight for each bias
-    for layer_count in number_of_layers:
-        for node_count in number_of_nodes:
-            arr = np.random.uniform(low=-1.0,high=1.0,size=(int(number_of_nodes)))
-            node.append(arr)
-        layer.append(node)
-    weight_bias.append(layer)
-    #empty used arrays
-    node.clear()
-    layer.clear()
+    for layer_count in range(0,int(number_of_layers)):
+        arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
+        layer1.append(arr)
+    weight_bias.append(layer1)
+
     #initial bias as 1
-    for layer_count in number_of_layers:
-        for node_count in number_of_nodes:
-            arr = np.ones(int(number_of_nodes))
-            node.append(arr)
-        layer.append(node)
-    bias.append(layer)  
+    for layer_count in range(0,int(number_of_layers)):
+        arr = np.ones(int(number_of_nodes))
+        layer2.append(arr)
+    bias.append(layer2)  
+    # print(weight_bias)
+    # print()
+    # print(bias)
     return weight_bias, bias
 
 
@@ -102,6 +101,7 @@ def main():
     arr_input_nodes = createInputNodes(number_of_features)
     arr_hidden_layers = createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
     arr_weight_bias, arr_bias = createBias(number_of_nodes,number_of_layers)
+    # createBias(number_of_nodes,number_of_layers)
     arr_output_nodes = createOutputNodes(number_of_classes)
 
     print(arr_bias)
