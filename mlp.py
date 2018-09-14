@@ -25,17 +25,21 @@ def getInput():
             check = True
         else:
             print("Invalid function number !") 
-    number_of_classes = input("Learning rate : ")
+    learning_rate = input("Learning rate : ")
     type(learning_rate)
-    number_of_classes = input("Momentum : ")
+    momentum = input("Momentum : ")
     type(momentum) 
-    return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes,
+    return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, \
            learning_rate, momentum
 
 
 def createInputNodes(number_of_features):
     arr_input_nodes = np.zeros(int(number_of_features))
     return arr_input_nodes
+
+def createOutputNodes(number_of_classes):
+    arr_output_nodes = np.zeros(int(number_of_classes))
+    return arr_output_nodes
 
 def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes):
     # first hidden layer that is connected with input nodes
@@ -66,11 +70,43 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
         last_layer.append(arr)
         count += 1
     final.append(last_layer)
-    print(final)
+    return final
+
+def createBias(number_of_nodes,number_of_layers):
+    weight_bias = []
+    node1 = []
+    layer1 = []
+    node2 = []
+    layer2 =[]
+    bias = []
+    #initial weight for each bias
+    for layer_count in range(0,int(number_of_layers)):
+        arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
+        layer1.append(arr)
+    weight_bias.append(layer1)
+
+    #initial bias as 1
+    for layer_count in range(0,int(number_of_layers)):
+        arr = np.ones(int(number_of_nodes))
+        layer2.append(arr)
+    bias.append(layer2)  
+    # print(weight_bias)
+    # print()
+    # print(bias)
+    return weight_bias, bias
+
+
 def main():
-    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes = getInput()
+    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum = getInput()
     arr_input_nodes = createInputNodes(number_of_features)
-    createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
+    arr_hidden_layers = createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
+    arr_weight_bias, arr_bias = createBias(number_of_nodes,number_of_layers)
+    # createBias(number_of_nodes,number_of_layers)
+    arr_output_nodes = createOutputNodes(number_of_classes)
+
+    print(arr_bias)
+    print()
+    print(arr_weight_bias)
     # readFile("/home/thatchayut/Desktop/MLP/Flood_data_set_edited.txt")
 
 if __name__ == '__main__':
