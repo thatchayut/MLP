@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import numpy as np
-import pandas
 import init_node as init
+import cross_validation as cv
 
 def readFile(file):
     doc = open(file, "r")
@@ -40,16 +40,27 @@ def getInput():
     type(learning_rate)
     momentum = input("Momentum : ")
     type(momentum) 
+    check = False
+    print("k-fold cross validation ...")
+    print("Enter k ...")
+    while (check == False):
+        fold = input("k : ")
+        type(fold)
+        if(fold.isnumeric() == True):
+            check = True
+        else:
+            print("Invalid input ...")
     return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, \
-           learning_rate, momentum, beta
+           learning_rate, momentum, beta, fold
 
 def main():
     #initialize network
-    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta = getInput()
-    arr_input_nodes = init.createInputNodes(number_of_features)
-    arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
-    arr_weight_bias, arr_bias = init.createBias(number_of_nodes,number_of_layers)
-    arr_output_nodes = init.createOutputNodes(number_of_classes)
+    # number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold = getInput()
+    # arr_input_nodes = init.createInputNodes(number_of_features)
+    # arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
+    # arr_weight_bias, arr_bias = init.createBias(number_of_nodes,number_of_layers)
+    # arr_output_nodes = init.createOutputNodes(number_of_classes)
+    cv.crossValidation("flood-input.csv",5)
 
 
 if __name__ == '__main__':
