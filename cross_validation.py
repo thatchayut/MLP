@@ -13,7 +13,8 @@ def chunks(l, n):
         # Create an index range for l of n items:
         yield l[i:i+n]
 
-def crossValidation(file,number_of_fold):
+def crossValidation(file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_output_nodes, arr_weight_bias, arr_bias, \
+                    momentum, learning_rate, beta):
     data = readFile(file)
     dataframe = pandas.DataFrame(data)
     number_of_data = dataframe.shape[0] + 1
@@ -26,7 +27,7 @@ def crossValidation(file,number_of_fold):
     # print(arr_row)
     # find size of each part
     # number_of_fold = 5 # JUST FOR TEST!!!
-    size = math.ceil(number_of_data/number_of_fold)
+    size = math.ceil(number_of_data/int(number_of_fold))
     # print(size)
     # split data into k parts
     data_chunk = list(chunks(arr_row, size))

@@ -55,12 +55,19 @@ def getInput():
 
 def main():
     #initialize network
-    # number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold = getInput()
-    # arr_input_nodes = init.createInputNodes(number_of_features)
-    # arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
-    # arr_weight_bias, arr_bias = init.createBias(number_of_nodes,number_of_layers)
-    # arr_output_nodes = init.createOutputNodes(number_of_classes)
-    cv.crossValidation("flood-input.csv",10)
+    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold = getInput()
+    arr_input_nodes = init.createInputNodes(number_of_features)
+    arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
+    arr_Y = init.createY(number_of_nodes, number_of_layers)
+    arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
+    arr_output_nodes = init.createOutputNodes(number_of_classes)
+    cv.crossValidation("flood-input.csv", fold, arr_input_nodes, arr_hidden_layers, arr_output_nodes, arr_weight_bias, arr_bias, \
+                    momentum, learning_rate, beta)
+    print(arr_hidden_layers[1])
+    print("all layer : " + str(len(arr_hidden_layers)))
+    print("hidden : " + str(len(arr_hidden_layers[1])))
+    print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
+    # print(arr_weight_bias)
 
 
 if __name__ == '__main__':
