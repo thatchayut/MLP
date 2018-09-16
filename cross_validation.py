@@ -32,4 +32,18 @@ def crossValidation(file,number_of_fold):
     data_chunk = list(chunks(arr_row, size))
     print("\nData chunks ...")
     print(data_chunk)
-
+    print (len(data_chunk))
+    # test and train
+    count = 0
+    for test_element in data_chunk:
+        count += 1
+        print("------------------------------" + str(count) + " fold ------------------------------")
+        test_part = test_element
+        for train_element in data_chunk:
+            if(train_element not in test_part):
+                print("TRAIN----------------")
+                print(train_element)
+                print()
+        print("TEST------")
+        print(test_part)
+        print()

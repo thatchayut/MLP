@@ -60,7 +60,7 @@ def main():
     # arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
     # arr_weight_bias, arr_bias = init.createBias(number_of_nodes,number_of_layers)
     # arr_output_nodes = init.createOutputNodes(number_of_classes)
-    cv.crossValidation("flood-input.csv",5)
+    cv.crossValidation("flood-input.csv",10)
 
 
 if __name__ == '__main__':
