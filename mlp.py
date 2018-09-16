@@ -63,10 +63,16 @@ def main():
     arr_output_nodes = init.createOutputNodes(number_of_classes)
     cv.crossValidation("flood-input.csv", fold, arr_input_nodes, arr_hidden_layers, arr_output_nodes, arr_weight_bias, arr_bias, \
                     momentum, learning_rate, beta)
-    print(arr_hidden_layers[1])
-    print("all layer : " + str(len(arr_hidden_layers)))
-    print("hidden : " + str(len(arr_hidden_layers[1])))
-    print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
+    print(arr_hidden_layers)
+    print("size of list containing hidden layer : " + str(len(arr_hidden_layers)))
+    print(str(len(arr_hidden_layers) - 1) + " layer(s) of weigh connected to hidden node")
+    print("1 layer of weight connected to INPUT layer")
+    print("1 layer connected to OUTPUT layer")
+    print("total layer of weight : " + str(1 + len(arr_hidden_layers)))
+    #FOR DEBUGGING!!!
+    # print("all layer : " + str(len(arr_hidden_layers)))
+    # print("hidden : " + str(len(arr_hidden_layers[1])))
+    # print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
     # print(arr_weight_bias)
 
 
