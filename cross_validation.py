@@ -2,6 +2,7 @@ import pandas
 import numpy as np
 import random
 import math
+import init_node as init
 
 def readFile(file):
     data = pandas.read_csv(file)
@@ -21,7 +22,8 @@ def chunks(l, n):
         # Create an index range for l of n items:
         yield l[i:i+n]
 
-def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_output_nodes):
+def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers, \
+            number_of_nodes, number_of_layers):
     # change number of line in to dataframe
     line = line - 2
     # print("line : " + str(line + 2))
@@ -66,10 +68,25 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
             count += 1
         print("output : " + str(arr_output_nodes))
         print()        
+    
+    # CALCULATE Y of each node 
+    for layer_index in range(0, len(arr_Y)):
+        if (layer_index == 0):
+            for index in range(0, len(arr_Y[layer_index])):
+                for node_index in range(0, len(arr_hidden_layers[layer_index])):
+                    for weight in arr_hidden_layers[layer_index][node_index]:
+                        arr_Y[layer_index][index] += (weight * arr_input_nodes[node_index])
+                    # arr_Y[layer_index][index] += (arr_hidden_layers[layer_index][node_index] * arr_input_nodes[node_index])
+    print("arr_Y" + str(arr_Y))
 
+    #reset arr_Y
+    for layer_index in range(0, len(arr_Y)):
+        for node_index in range(0,len(arr_Y[layer_index])):
+            arr_Y[layer_index][node_index] = 0
+    print("arr_Y after reset: " + str(arr_Y))
 
 def crossValidation(input_file, output_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
-                    function, momentum, learning_rate, beta):
+                    function, momentum, learning_rate, beta, number_of_nodes, number_of_layers):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
     print(dataframe_output)
@@ -104,7 +121,8 @@ def crossValidation(input_file, output_file, number_of_fold, arr_input_nodes, ar
                 print(train_element)
                 print()
                 for element in train_element:
-                    forward(dataframe_input, dataframe_output, element, arr_input_nodes, arr_output_nodes)
+                    forward(dataframe_input, dataframe_output, element, arr_input_nodes, arr_output_nodes, arr_Y, \
+                    arr_hidden_layers, number_of_nodes, number_of_layers)
         print("TEST------")
         print(test_part)
         print()

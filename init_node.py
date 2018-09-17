@@ -72,7 +72,7 @@ def createY(number_of_nodes, number_of_layers):
     layer = []
     final = []
     for layer_count in range(0, int(number_of_layers)):
-        arr = np.ones(int(number_of_nodes))
+        arr = np.zeros(int(number_of_nodes))
         layer.append(arr)
     final.append(layer)
     return layer 
