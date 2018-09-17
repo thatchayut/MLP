@@ -54,14 +54,14 @@ def createBias(number_of_nodes,number_of_layers):
     #initial weight for each bias
     for layer_count in range(0,int(number_of_layers)):
         arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
-        layer1.append(arr)
-    weight_bias.append(layer1)
+        weight_bias.append(arr)
+    # weight_bias.append(layer1)
 
     #initial bias as 1
     for layer_count in range(0,int(number_of_layers)):
         arr = np.ones(int(number_of_nodes))
-        layer2.append(arr)
-    bias.append(layer2)  
+        bias.append(arr)
+    # bias.append(layer2)  
     # print(weight_bias)
     # print()
     # print(bias)
@@ -70,9 +70,9 @@ def createBias(number_of_nodes,number_of_layers):
 def createY(number_of_nodes, number_of_layers):
     node = []
     layer = []
-    final = []
+    # final = []
     for layer_count in range(0, int(number_of_layers)):
         arr = np.zeros(int(number_of_nodes))
         layer.append(arr)
-    final.append(layer)
+    # final.append(layer)
     return layer 
