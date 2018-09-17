@@ -18,22 +18,36 @@ def readFile(file):
     random.shuffle(arr_row)
     return data, dataframe, number_of_data, arr_row
 
-def featureScaling(data):
-    max_value = max(data)
-    min_value = min(data)
-    mean_value = statistics.mean(data) 
-    normalized_data = []
+def featureScaling(input_data, output_data):
+    merged_data = []
+    for element in input_data:
+        merged_data.append(element)
+    for element in output_data:
+        merged_data.append(element)
+    max_value = max(merged_data)
+    min_value = min(merged_data)
+    mean_value = statistics.mean(merged_data) 
     print("max" + str(max_value))
     print("min" + str(min_value))
     print("mean" + str(mean_value))
-    for element in data:
+    normalized_input_data = []
+    for element in input_data:
         # data[index] = (data[index] - mean_value)/(max_value - min_value)
         result = (element - mean_value)/(max_value - min_value)
         result = round(result,5)
-        normalized_data.append(result)
+        normalized_input_data.append(result)
         # print("testtttttttttt")
-    print("normalized data : " + str(normalized_data))
-    return normalized_data
+    print("normalized_input_data : " + str(normalized_input_data))
+    normalized_output_data = []
+    for element in output_data:
+        # data[index] = (data[index] - mean_value)/(max_value - min_value)
+        result = (element - mean_value)/(max_value - min_value)
+        result = round(result,5)
+        normalized_output_data.append(result)
+        # print("testtttttttttt")
+    print("normalized_output_data : " + str(normalized_output_data))
+
+    return normalized_input_data, normalized_output_data
 
 def chunks(l, n):
     # For item i in a range that is a length of l,
@@ -60,19 +74,21 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
     # change number of line in to dataframe
     line = line - 2
     # print("line : " + str(line + 2))
-    print(dataframe_input.iloc[line])
     data_input = dataframe_input.iloc[line]
-    data_input = featureScaling(data_input)
+    print(data_input)
+    # data_input = featureScaling(data_input)
     # print(data_input)
     data_output = dataframe_output.iloc[line]
     print(data_output)
-    print(len(data_input))
+    # data_output = featureScaling(data_output)
+    data_input, data_output = featureScaling(data_input, data_output)
+    # print(len(data_input))
 
     # check if input node is enough
     # data.shape[0] - 1 = actual inputs (desired output is excluded)
     # assign value to input nodes
     check = False
-    if ((len(data_input)) == len(arr_input_nodes)):
+    if (len(data_input) == len(arr_input_nodes)):
         print("OK")
         check = True
     else:
@@ -89,7 +105,7 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
     
     # assign value to output nodes
     check = False
-    if ((data_output.shape[0]) == len(arr_output_nodes)):
+    if (len(data_output) == len(arr_output_nodes)):
         print("OK")
         check = True
     else:
@@ -114,18 +130,6 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
                             arr_Y[layer_index][index] += (weight * arr_input_nodes[node_index])
                             arr_Y[layer_index][index] += (arr_weight_bias[layer_index][index] * arr_bias[layer_index][index])
                     # modify output using activation function
-                    # if (function_number == "1"):
-                    #     arr_Y[layer_index][index] = function.sigmoid(arr_Y[layer_index][index])  
-                    #     print("sigmoiddddddddd")             
-                    # elif(function_number == "2"):
-                    #     arr_Y[layer_index][index] = function.hyperbolicTangent(arr_Y[layer_index][index])
-                    #     print("hyperrrrrrrrr")
-                    # elif(function_number == "3"):
-                    #     arr_Y[layer_index][index] = function.unitStep(arr_Y[layer_index][index], beta)
-                    #     print("unittttttttt")
-                    # elif(function_number == "4"):
-                    #     arr_Y[layer_index][index] = function.sigmoid(arr_Y[layer_index][index], beta)
-                    #     print("rampppppp")
                     arr_Y[layer_index][index] = useFunction(arr_Y[layer_index][index], function_number, beta)
         print("arr_Y" + str(arr_Y))
 
@@ -140,17 +144,6 @@ def crossValidation(input_file, output_file, number_of_fold, arr_input_nodes, ar
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
     print(dataframe_output)
-    # dataframe = pandas.DataFrame(data)
-    # # print(dataframe.iloc[0])
-    # number_of_data = dataframe.shape[0] + 1
-    # print("Number of data : " + str(number_of_data))
-    # # array contains indicators of each data
-    # arr_row = np.arange(1,number_of_data + 1)
-    # # print(arr_row)
-    # # shuffle to decrease order dependency
-    # random.shuffle(arr_row)
-    # print(arr_row)
-    # find size of each part
     # number_of_fold = 5 # JUST FOR TEST!!!
     size = math.ceil(number_of_data_input/int(number_of_fold))
     # print(size)
