@@ -2,6 +2,7 @@
 import numpy as np
 import init_node as init
 import cross_validation as cv
+import math
 
 def readFile(file):
     doc = open(file, "r")
@@ -19,7 +20,7 @@ def getInput():
     type(number_of_classes)
     check = False
     while (check == False):
-        print("Select Activation function : [1]Sigmoid [2]Hyperbolic Tangent")
+        print("Select Activation function : [1]Sigmoid [2]Hyperbolic Tangent [3]Unit Step [4]Ramp")
         function = input("Function number : ")
         type(function)
         if ((function is  "1") or (function is  "2") or (function is "3") or (function is "4")):
