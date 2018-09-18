@@ -18,18 +18,7 @@ def readFile(file):
     random.shuffle(arr_row)
     return data, dataframe, number_of_data, arr_row
 
-def featureScaling(input_data, output_data):
-    merged_data = []
-    for element in input_data:
-        merged_data.append(element)
-    for element in output_data:
-        merged_data.append(element)
-    max_value = max(merged_data)
-    min_value = min(merged_data)
-    mean_value = statistics.mean(merged_data) 
-    print("max" + str(max_value))
-    print("min" + str(min_value))
-    print("mean" + str(mean_value))
+def featureScaling(input_data, output_data, min_value, max_value, mean_value):
     normalized_input_data = []
     for element in input_data:
         # data[index] = (data[index] - mean_value)/(max_value - min_value)
@@ -69,8 +58,16 @@ def useFunction(data, function_number, beta):
         print("rampppppp")
         return function.sigmoid(data, beta)  
 
-def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
+def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, function_number, beta):
+    # calculate min, max, mean to be used in feature scaling
+    min_value = data_all.min()
+    max_value = data_all.max()
+    mean_value = data_all.mean()
+    mean_value = round(mean_value, 5)
+    print("MIN from ALL : " + str(min_value[1]))
+    print("MAX from ALL : " + str(max_value[1]))
+    print("MEAN from ALL : " + str(mean_value[1]))
     # change number of line in to dataframe
     line = line - 2
     # print("line : " + str(line + 2))
@@ -81,7 +78,7 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
     data_output = dataframe_output.iloc[line]
     print(data_output)
     # data_output = featureScaling(data_output)
-    data_input, data_output = featureScaling(data_input, data_output)
+    data_input, data_output = featureScaling(data_input, data_output, min_value[1], max_value[1], mean_value[1])
     # print(len(data_input))
 
     # check if input node is enough
@@ -139,10 +136,11 @@ def forward (dataframe_input, dataframe_output, line, arr_input_nodes, arr_outpu
             arr_Y[layer_index][node_index] = 0
     print("arr_Y after reset: " + str(arr_Y))
 
-def crossValidation(input_file, output_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
+def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
                     function_number, momentum, learning_rate, beta):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
+    data_all, dataframe_all, number_of_data_all, arr_row_all = readFile(full_data_file)
     print(dataframe_output)
     # number_of_fold = 5 # JUST FOR TEST!!!
     size = math.ceil(number_of_data_input/int(number_of_fold))
@@ -164,7 +162,7 @@ def crossValidation(input_file, output_file, number_of_fold, arr_input_nodes, ar
                 print(train_element)
                 print()
                 for element in train_element:
-                    forward(dataframe_input, dataframe_output, element, arr_input_nodes, arr_output_nodes, arr_Y, \
+                    forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, function_number, beta)
         print("TEST------")
         print(test_part)
