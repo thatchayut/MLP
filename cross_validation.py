@@ -59,10 +59,19 @@ def useFunction(data, function_number, beta):
         return function.sigmoid(data, beta)  
 
 def calculateError(actual_output, desired_output):
+    arr_error = []
+    sse = 0
     for index in range(0, len(actual_output)):
-        error = math.fabs(desired_output[index] - actual_output[index])
-        error_percentage = math.fabs((error/actual_output[index]) * 100)
-        print("absolute error of output #" + str(index) + " = " + str(error) + "(" + str(error_percentage) + " %)")
+        error_value = (desired_output[index] - actual_output[index])
+        error_percentage = ((error_value/actual_output[index]) * 100)
+        arr_error.append(error_value)
+        print("absolute error of output #" + str(index) + " = " + str(error_value) + "(" + str(error_percentage) + " %)")
+    print("arr _error : " + str(arr_error))
+    # calculate Sum Square Error (SSE)
+    for element in arr_error:
+        sse += (1/2)*(element * element)
+    print("sse : " + str(sse))
+    return sse
 
 def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta):
@@ -160,21 +169,21 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print("arr_Y" + str(arr_Y))
         print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         print("data output(desired output)  : " + str(data_output))
-        calculateError(arr_output_nodes, data_output)
+        sse = calculateError(arr_output_nodes, data_output)
     else:
         print("cannot do FORWARDING!")
         print()
-    #reset arr_Y
-    for layer_index in range(0, len(arr_Y)):
-        for node_index in range(0,len(arr_Y[layer_index])):
-            arr_Y[layer_index][node_index] = 0
-    print("arr_Y after reset: " + str(arr_Y))
+    # #reset arr_Y
+    # for layer_index in range(0, len(arr_Y)):
+    #     for node_index in range(0,len(arr_Y[layer_index])):
+    #         arr_Y[layer_index][node_index] = 0
+    # print("arr_Y after reset: " + str(arr_Y))
 
-    #reset arr_output_nodes
-    for node_index in range(0, len(arr_output_nodes)):
-        arr_output_nodes[node_index] = 0
-    print("arr_output_nodes after reset : " + str(arr_output_nodes))
-    print("------------------------------------------------------------------------------------------------------")
+    # #reset arr_output_nodes
+    # for node_index in range(0, len(arr_output_nodes)):
+    #     arr_output_nodes[node_index] = 0
+    # print("arr_output_nodes after reset : " + str(arr_output_nodes))
+    # print("------------------------------------------------------------------------------------------------------")
 
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
                     arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta):
@@ -204,6 +213,17 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 for element in train_element:
                     forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
+                    #reset arr_Y
+                    for layer_index in range(0, len(arr_Y)):
+                        for node_index in range(0,len(arr_Y[layer_index])):
+                            arr_Y[layer_index][node_index] = 0
+                    print("arr_Y after reset: " + str(arr_Y))
+
+                    #reset arr_output_nodes
+                    for node_index in range(0, len(arr_output_nodes)):
+                        arr_output_nodes[node_index] = 0
+                    print("arr_output_nodes after reset : " + str(arr_output_nodes))
+                    print("------------------------------------------------------------------------------------------------------")
         print("TEST------")
         print(test_part)
         print()
