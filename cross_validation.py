@@ -58,6 +58,12 @@ def useFunction(data, function_number, beta):
         # print("rampppppp")
         return function.sigmoid(data, beta)  
 
+def calculateError(actual_output, desired_output):
+    for index in range(0, len(actual_output)):
+        error = math.fabs(desired_output[index] - actual_output[index])
+        error_percentage = math.fabs((error/actual_output[index]) * 100)
+        print("absolute error of output #" + str(index) + " = " + str(error) + "(" + str(error_percentage) + " %)")
+
 def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta):
     # calculate min, max, mean to be used in feature scaling
@@ -82,16 +88,17 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     # print(len(data_input))
 
     # check if input nodes are enough
-    valid_check = False
+    input_check = False
     if (len(data_input) == len(arr_input_nodes)):
         print("Input later : OK")
-        valid_check = True
+        print()
+        input_check = True
     else:
         print("invalid input nodes")
         print() 
      # assign value to input nodes  
     count = 0
-    if (valid_check == True):
+    if (input_check == True):
         for data_element in data_input:
             arr_input_nodes[count] = data_element
             count += 1
@@ -99,10 +106,11 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         # print()
     
     # check if output nodes are enough
-    valid_check = False
+    output_check = False
     if (len(data_output) == len(arr_output_nodes)):
         print("Output layer : OK")
-        valid_check = True
+        print()
+        output_check = True
     else:
         print("invalid output nodes")
         print()
@@ -117,7 +125,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     #     print("arr_output_nodes : " + str(arr_output_nodes))
     #     print()
         # CALCULATE Y of each node only when INPUT and OUTPUT are VALID
-    if (valid_check == True):
+    if ((input_check == True) and (output_check == True)):
         print("BEFORE... output nodes : " + str(arr_output_nodes))
         for layer_index in range(0, len(arr_Y)):
             # weight from an input layer to the 1st hidden layer
@@ -131,27 +139,31 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
                     arr_Y[layer_index][index] = useFunction(arr_Y[layer_index][index], function_number, beta)
             # calcualte output at the last hidden layer
             elif (layer_index == (len(arr_Y) - 1)):
-                print("testtttttttttttttttttttttt")
+                # print("testtttttttttttttttttttttt")
                 for output_index in range(0, len(arr_output_nodes)):
                     for index in range(0, len(arr_Y[layer_index])):
                         for node_index in range(0, len(arr_hidden_layers[2])):
                             for weight in arr_hidden_layers[2][node_index]:
                                 arr_output_nodes[output_index] += (weight * arr_Y[layer_index][index])
-                                print("abcddddd : " + str(arr_output_nodes))
                     arr_output_nodes[output_index] += (arr_weight_bias_output[output_index] * arr_bias_output[output_index])
-                    # arr_output_nodes[output_index] = useFunction(arr_output_nodes[output_index], function_number, beta) 
-            # else:
-            # # calculate output for all nodes in hidden layers except the first layer connected to input node
-            #     for layer_index in range(1, len(arr_Y) - 1):
-            #         for index in range(0, len(arr_Y[layer_index])):
-            #             for weight_layer in range(0, len(arr_hidden_layers[1])):
-            #                 for node_index in range(0, len(arr_hidden_layers[1][weight_layer])):
-            #                     arr_Y[layer_index][index] += (arr_Y[layer_index - 1][node_index] * arr_hidden_layers[1][weight_layer][node_index])
-            #                     arr_Y[layer_index][index] += (arr_weight_bias[layer_index][index] * arr_bias[layer_index][index])
-            #         arr_Y[layer_index][index] = useFunction(arr[layer_index][index], function_number, beta)
+                    arr_output_nodes[output_index] = useFunction(arr_output_nodes[output_index], function_number, beta) 
+            else:
+            # calculate output for all nodes in hidden layers except the first layer connected to input node
+                for layer_index in range(1, len(arr_Y) - 1):
+                    for index in range(0, len(arr_Y[layer_index])):
+                        for weight_layer in range(0, len(arr_hidden_layers[1])):
+                            for node_index in range(0, len(arr_hidden_layers[1][weight_layer])):
+                                for weigth_to_node in range(0, len(arr_hidden_layers[1][weight_layer][node_index])):
+                                    arr_Y[layer_index][index] += (arr_Y[layer_index - 1][node_index] * arr_hidden_layers[1][weight_layer][node_index][weigth_to_node])
+                                    arr_Y[layer_index][index] += (arr_weight_bias[layer_index][index] * arr_bias[layer_index][index])
+                    arr_Y[layer_index][index] = useFunction(arr_Y[layer_index][index], function_number, beta)
         print("arr_Y" + str(arr_Y))
-        print("arr_output_nodes : " + str(arr_output_nodes))
-
+        print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
+        print("data output(desired output)  : " + str(data_output))
+        calculateError(arr_output_nodes, data_output)
+    else:
+        print("cannot do FORWARDING!")
+        print()
     #reset arr_Y
     for layer_index in range(0, len(arr_Y)):
         for node_index in range(0,len(arr_Y[layer_index])):
@@ -162,6 +174,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     for node_index in range(0, len(arr_output_nodes)):
         arr_output_nodes[node_index] = 0
     print("arr_output_nodes after reset : " + str(arr_output_nodes))
+    print("------------------------------------------------------------------------------------------------------")
 
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
                     arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta):
