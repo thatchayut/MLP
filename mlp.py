@@ -62,8 +62,9 @@ def main():
     arr_Y = init.createY(number_of_nodes, number_of_layers)
     arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
     arr_output_nodes = init.createOutputNodes(number_of_classes)
+    arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
     cv.crossValidation("flood-input.csv", "flood-output.csv", "flood-data-full.csv", fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
-                        function, momentum, learning_rate, beta)
+                        arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta)
     print(arr_hidden_layers)
     print()
     print("size of list containing hidden layer : " + str(len(arr_hidden_layers)))
@@ -76,7 +77,9 @@ def main():
     # print("hidden : " + str(len(arr_hidden_layers[1])))
     # print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
     # print(arr_weight_bias)
-    print(arr_Y)
+    # print(arr_Y)
+    print("arr_weight_bias_output" + str(arr_weight_bias_output))
+    print("arr_bias_output" + str(arr_bias_output))
     print(arr_weight_bias)
     print(arr_bias)
 

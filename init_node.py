@@ -67,6 +67,7 @@ def createBias(number_of_nodes,number_of_layers):
     # print(bias)
     return weight_bias, bias
 
+
 def createY(number_of_nodes, number_of_layers):
     node = []
     layer = []
