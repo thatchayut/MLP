@@ -77,3 +77,17 @@ def createY(number_of_nodes, number_of_layers):
         layer.append(arr)
     # final.append(layer)
     return layer 
+
+def createLocalGradOutput(number_of_classes):
+    arr_grad_output = np.zeros(int(number_of_classes))
+    return arr_grad_output
+
+def createLocalGradHidden(number_of_nodes, number_of_layers):
+    node = []
+    arr_grad_hidden = []
+    # final = []
+    for layer_count in range(0, int(number_of_layers)):
+        arr = np.zeros(int(number_of_nodes))
+        arr_grad_hidden.append(arr)
+    # final.append(layer)
+    return arr_grad_hidden 

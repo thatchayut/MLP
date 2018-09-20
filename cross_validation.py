@@ -22,7 +22,7 @@ def featureScaling(input_data, output_data, min_value, max_value, mean_value):
     normalized_input_data = []
     for element in input_data:
         # data[index] = (data[index] - mean_value)/(max_value - min_value)
-        result = (element - mean_value)/(max_value - min_value)
+        result = (element - min_value)/(max_value - min_value)
         result = round(result,5)
         normalized_input_data.append(result)
         # print("testtttttttttt")
@@ -71,7 +71,7 @@ def calculateError(actual_output, desired_output):
     for element in arr_error:
         sse += (1/2)*(element * element)
     print("sse : " + str(sse))
-    return sse
+    return sse, arr_error
 
 def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta):
@@ -158,7 +158,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
                     arr_output_nodes[output_index] = useFunction(arr_output_nodes[output_index], function_number, beta) 
             else:
             # calculate output for all nodes in hidden layers except the first layer connected to input node
-                for layer_index in range(1, len(arr_Y) - 1):
+                for layer_index in range(1, len(arr_Y)):
                     for index in range(0, len(arr_Y[layer_index])):
                         for weight_layer in range(0, len(arr_hidden_layers[1])):
                             for node_index in range(0, len(arr_hidden_layers[1][weight_layer])):
@@ -169,10 +169,11 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print("arr_Y" + str(arr_Y))
         print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         print("data output(desired output)  : " + str(data_output))
-        sse = calculateError(arr_output_nodes, data_output)
+        sse, arr_error = calculateError(arr_output_nodes, data_output)
     else:
         print("cannot do FORWARDING!")
         print()
+    return sse, arr_error
     # #reset arr_Y
     # for layer_index in range(0, len(arr_Y)):
     #     for node_index in range(0,len(arr_Y[layer_index])):
@@ -185,8 +186,19 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     # print("arr_output_nodes after reset : " + str(arr_output_nodes))
     # print("------------------------------------------------------------------------------------------------------")
 
+def backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error):
+    new_arr = []
+    new_arr.append(arr_Y)
+    new_arr.append(arr_output_nodes)
+    arr_grad = []
+    arr_grad.append(arr_grad_hidden)
+    arr_grad.append(arr_grad_output)
+    print("arr_Y : " + str(arr_Y))
+    print("new_arr" + str(new_arr))
+    print("arr_grad_hidden, arr_grad_output" + str(arr_grad))
+
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
-                    arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta):
+                    arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
     data_all, dataframe_all, number_of_data_all, arr_row_all = readFile(full_data_file)
@@ -211,8 +223,12 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 print(train_element)
                 print()
                 for element in train_element:
-                    forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
+
+                    sse, arr_error = forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
+
+                    backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error)
+
                     #reset arr_Y
                     for layer_index in range(0, len(arr_Y)):
                         for node_index in range(0,len(arr_Y[layer_index])):
