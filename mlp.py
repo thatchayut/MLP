@@ -63,8 +63,11 @@ def main():
     arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
     arr_output_nodes = init.createOutputNodes(number_of_classes)
     arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
+    arr_grad_output = init.createLocalGradOutput(number_of_classes)
+    arr_grad_hidden = init.createLocalGradHidden(number_of_nodes, number_of_layers)
     cv.crossValidation("flood-input.csv", "flood-output.csv", "flood-data-full.csv", fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
-                        arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta)
+                        arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output)
+    print("arr_hidden_layers : ")
     print(arr_hidden_layers)
     print()
     print("size of list containing hidden layer : " + str(len(arr_hidden_layers)))
@@ -78,10 +81,13 @@ def main():
     # print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
     # print(arr_weight_bias)
     # print(arr_Y)
-    print("arr_weight_bias_output" + str(arr_weight_bias_output))
-    print("arr_bias_output" + str(arr_bias_output))
-    print(arr_weight_bias)
-    print(arr_bias)
+    print("arr_weight_bias_output : " + str(arr_weight_bias_output))
+    print("arr_bias_output : " + str(arr_bias_output))
+    print("arr_weight_bias : " + str(arr_weight_bias))
+    print("arr_bias : " + str(arr_bias))
+    print("arr_grad_output : " + str(arr_grad_output))
+    print("arr_grad_hidden : " + str(arr_grad_hidden))
+    print()
 
 
 if __name__ == '__main__':
