@@ -81,6 +81,13 @@ def calculateError(actual_output, desired_output):
     print("sse : " + str(sse))
     return sse, arr_error
 
+def calcualteMSE(arr_error, number_of_data):
+    result = 0
+    for element in arr_error:
+        result += element
+    result = result/number_of_data
+    return result
+
 def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta):
     # calculate min, max, mean to be used in feature scaling
@@ -180,10 +187,11 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         print("data output(desired output)  : " + str(data_output))
         sse, arr_error = calculateError(arr_output_nodes, data_output)
+        return sse, arr_error
     else:
         print("cannot do FORWARDING!")
         print()
-    return sse, arr_error
+
     # #reset arr_Y
     # for layer_index in range(0, len(arr_Y)):
     #     for node_index in range(0,len(arr_Y[layer_index])):
@@ -196,7 +204,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     # print("arr_output_nodes after reset : " + str(arr_output_nodes))
     # print("------------------------------------------------------------------------------------------------------")
 
-def backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number):
+def backward(arr_hidden_layers, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number):
     arr_output_merged = []
     arr_output_merged.append(arr_Y)
     arr_output_merged.append(arr_output_nodes)
@@ -218,11 +226,44 @@ def backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_erro
                 for output_index in range(0, len(arr_output_nodes)):
                     arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * arr_output_nodes[output_index] * \
                                                                (1 - arr_output_nodes[output_index])
+            # in case of using Hyperbolic Tangent function
+            elif(function_number == "2"):
+                for output_index in range(0, len(arr_output_nodes)):
+                    arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * ( 2 * arr_output_nodes[output_index] * \
+                                                               (1 - arr_output_nodes[output_index]))
+        #in case of hidden layers
+        else:
+            reversed_layer_index = len(arr_grad) - list_index - 1
+            for grad_layer_index in range(0, len(arr_grad[reversed_layer_index])):
+                reversed_grad_layer_index = len(arr_grad[reversed_layer_index]) - grad_layer_index - 1
+                # last hidden layers -> output layer
+                if(reversed_grad_layer_index == (len(arr_grad[reversed_layer_index]) - 1)):
+                    for grad_node_index in range(0, len(arr_grad[reversed_layer_index][reversed_grad_layer_index])):
+                        arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += \
+                        arr_Y[reversed_grad_layer_index][grad_node_index]
+                        sum = 0
+                        next_reversed_layer_index = reversed_layer_index + 1
+                        # for grad_output_node in range(0, len(arr_grad[next_reversed_layer_index])):
+                        for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
+                            sum += weight * arr_grad[next_reversed_layer_index]
+                    arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
+                # Input layer -> First Hidden layer 
+
     print("AFTER.......")
     print("arr_Y : " + str(arr_Y))
     print("arr_output_merged" + str(arr_output_merged))
     print("arr_grad_hidden, arr_grad_output" + str(arr_grad))
     print("arr_error : " + str(arr_error))
+
+    #reset arr_grad
+    for list_index in range(0, len(arr_grad)):
+        if(list_index == 0):
+            for layer_index in range(0, len(arr_grad[list_index])):
+                for node_index in range(0, len(arr_grad[list_index][layer_index])):
+                    arr_grad[list_index][layer_index][node_index] = 0
+        else:
+            # for output_grad_index in range(0, len(arr_grad[list_index])):
+            arr_grad[list_index]= 0
 
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
                     arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output):
@@ -253,13 +294,15 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     print("*****************************************************************************************************")
                     print("                                           FORWARD                                                   ")
                     print("*****************************************************************************************************")
+                    all_sse = []
                     sse, arr_error = forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
+                    all_sse.append(sse)
 
                     print("*****************************************************************************************************")
                     print("                                           BACKWARD                                                   ")
                     print("*****************************************************************************************************")
-                    backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number)
+                    backward(arr_hidden_layers, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number)
 
                     #reset arr_Y
                     for layer_index in range(0, len(arr_Y)):
@@ -272,6 +315,8 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         arr_output_nodes[node_index] = 0
                     print("arr_output_nodes after reset : " + str(arr_output_nodes))
                     print("------------------------------------------------------------------------------------------------------")
+                mse = calcualteMSE(all_sse, number_of_data_all)
+                print("MSE : " + str(mse))
         print("TEST------")
         print(test_part)
         print()
