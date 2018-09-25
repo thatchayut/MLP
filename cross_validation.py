@@ -2,9 +2,9 @@ import pandas
 import numpy as np
 import random
 import math
-import init_node as init
 import function
 import statistics
+import init_node as init
 
 def readFile(file):
     data = pandas.read_csv(file)
@@ -18,8 +18,16 @@ def readFile(file):
     random.shuffle(arr_row)
     return data, dataframe, number_of_data, arr_row
 
-def featureScaling(input_data, output_data, min_value, max_value, mean_value):
+def featureScaling(input_data, output_data):
     normalized_input_data = []
+    merged_data = [] 
+    merged_data.extend(input_data)
+    merged_data.extend(output_data)
+    print("merged_data" + str(merged_data))
+    min_value = min(merged_data)
+    max_value = max(merged_data)
+    print("MIN value : " + str(min_value))
+    print("MAX value : " + str(max_value))
     for element in input_data:
         # data[index] = (data[index] - mean_value)/(max_value - min_value)
         result = (element - min_value)/(max_value - min_value)
@@ -30,7 +38,7 @@ def featureScaling(input_data, output_data, min_value, max_value, mean_value):
     normalized_output_data = []
     for element in output_data:
         # data[index] = (data[index] - mean_value)/(max_value - min_value)
-        result = (element - mean_value)/(max_value - min_value)
+        result = (element - min_value)/(max_value - min_value)
         result = round(result,5)
         normalized_output_data.append(result)
         # print("testtttttttttt")
@@ -93,7 +101,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     data_output = dataframe_output.iloc[line]
     print(data_output)
     # data_output = featureScaling(data_output)
-    data_input, data_output = featureScaling(data_input, data_output, min_value[1], max_value[1], mean_value[1])
+    data_input, data_output = featureScaling(data_input, data_output)
     # print(len(data_input))
 
     # check if input nodes are enough
@@ -216,7 +224,7 @@ def backward(arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_erro
     print("arr_grad_hidden, arr_grad_output" + str(arr_grad))
     print("arr_error : " + str(arr_error))
 
-def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
+def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, \
                     arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
