@@ -3,6 +3,7 @@ import numpy as np
 import init_node as init
 import cross_validation as cv
 import math
+import copy
 
 def readFile(file):
     doc = open(file, "r")
@@ -59,8 +60,10 @@ def main():
     number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold = getInput()
     arr_input_nodes = init.createInputNodes(number_of_features)
     arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
-    arr_hidden_layers_new = arr_hidden_layers.copy()
-    arr_hidden_layers_template = arr_hidden_layers.copy()
+    # arr_hidden_layers_new = arr_hidden_layers.copy()
+    # arr_hidden_layers_template = arr_hidden_layers.copy()
+    arr_hidden_layers_new = copy.deepcopy(arr_hidden_layers)
+    arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers)
     arr_Y = init.createY(number_of_nodes, number_of_layers)
     arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
     arr_output_nodes = init.createOutputNodes(number_of_classes)
@@ -72,7 +75,9 @@ def main():
     print("arr_hidden_layers : ")
     print(arr_hidden_layers)
     print("arr_hidden_layers_new : ")
-    print(arr_hidden_layers)
+    print(arr_hidden_layers_new)
+    print("arr_hidden_layers_template : ")
+    print(arr_hidden_layers_template)
     print()
     print("size of list containing hidden layer : " + str(len(arr_hidden_layers)))
     print(str(len(arr_hidden_layers[1])) + " layer(s) of weigh connected to hidden node")

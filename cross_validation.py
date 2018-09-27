@@ -5,6 +5,7 @@ import math
 import function
 import statistics
 import init_node as init
+import copy
 
 def readFile(file):
     data = pandas.read_csv(file)
@@ -368,8 +369,8 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     #reset weight
                     # arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
                     # arr_hidden_layers_new = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
-                    arr_hidden_layers = arr_hidden_layers_template.copy()
-                    arr_hidden_layers_new = arr_hidden_layers_template.copy()
+                    arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
+                    arr_hidden_layers_new = copy.deepcopy(arr_hidden_layers_template)
                     #reset arr_Y
                     for layer_index in range(0, len(arr_Y)):
                         for node_index in range(0,len(arr_Y[layer_index])):
