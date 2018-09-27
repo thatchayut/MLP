@@ -25,7 +25,7 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
     # create all hidden layers except the first and the last layer that
     # are connected to input nodes and output nodes respectively
     
-    for layer_count in range(0, int(number_of_layers)-1):
+    for layer_count in range(0, int(number_of_layers)):
         for node_count in range(0,int(number_of_nodes)):
             arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
             node.append(arr)
