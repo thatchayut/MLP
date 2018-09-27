@@ -20,21 +20,21 @@ def getInput():
     type(number_of_classes)
     check = False
     while (check == False):
-        print("Select Activation function : [1]Sigmoid [2]Hyperbolic Tangent [3]Unit Step [4]Ramp")
+        print("Select Activation function : [1]Sigmoid [2]Hyperbolic Tangent")
         function = input("Function number : ")
         type(function)
-        if ((function is  "1") or (function is  "2") or (function is "3") or (function is "4")):
+        if ((function is  "1") or (function is  "2")):
             # Check for additional arguments
-            if ((function is "3") or (function is "4")):
-                beta = input("bata value : ")
-                type(beta)
-                while(beta.isnumeric() == False):
-                    beta = input("bata value : ")
-                    type(beta)
-                check = True
-            else:
-                beta = None
-                check = True          
+            # if ((function is "3") or (function is "4")):
+            #     beta = input("bata value : ")
+            #     type(beta)
+            #     while(beta.isnumeric() == False):
+            #         beta = input("bata value : ")
+            #         type(beta)
+            #     check = True
+            # else:
+            beta = None
+            check = True          
         else:
             print("Invalid function number !") 
     learning_rate = input("Learning rate : ")
@@ -74,7 +74,7 @@ def main():
     print(arr_hidden_layers)
     print()
     print("size of list containing hidden layer : " + str(len(arr_hidden_layers)))
-    print(str(len(arr_hidden_layers) - 1) + " layer(s) of weigh connected to hidden node")
+    print(str(len(arr_hidden_layers[1])) + " layer(s) of weigh connected to hidden node")
     print("1 layer of weight connected to INPUT layer")
     print("1 layer connected to OUTPUT layer")
     print("total layer of weight : " + str(1 + len(arr_hidden_layers)))
