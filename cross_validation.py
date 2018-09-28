@@ -249,7 +249,10 @@ def backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad
                             next_reversed_layer_index = reversed_layer_index + 1
                             # for grad_output_node in range(0, len(arr_grad[next_reversed_layer_index])):
                             for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
-                                sum += weight * arr_grad[next_reversed_layer_index]
+                                if(number_of_classes == "1"):
+                                    sum += weight * arr_grad[next_reversed_layer_index]
+                                else:
+                                    sum += weight * arr_grad[next_reversed_layer_index][grad_node_index]
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                     elif(function_number == "2"):
                         for grad_node_index in range(0, len(arr_grad[reversed_layer_index][reversed_grad_layer_index])):
@@ -259,7 +262,10 @@ def backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad
                             next_reversed_layer_index = reversed_layer_index + 1
                             # for grad_output_node in range(0, len(arr_grad[next_reversed_layer_index])):
                             for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
-                                sum += weight * arr_grad[next_reversed_layer_index]
+                                if(number_of_classes == "1"):
+                                    sum += weight * arr_grad[next_reversed_layer_index]
+                                else:
+                                    sum += weight * arr_grad[next_reversed_layer_index][grad_node_index]
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                 # Input layer -> First Hidden layer 
                 else:
