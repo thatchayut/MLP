@@ -334,7 +334,25 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     result += (float(learning_rate) * arr_grad[0][0][weight_node_index] * arr_input_nodes_with_value[weight_node_index])
                     arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] = result
                     print("AFTER UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
-                    "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]) )
+                    "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]))
+        # weight at hidden layer -> hidden layer
+        else:
+            reversed_list_index = len(arr_hidden_layers) - list_index - 1
+            for weight_layer_index in range(0, len(arr_hidden_layers[reversed_list_index])):
+                for weight_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index])):
+                    for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index])):
+                        result = 0
+                        print("BEFORE UPDATE -> arr_hidden_layers_new[1]["+str(weight_layer_index) + "][" + str(weight_node_index) \
+                        + "][" + str(weight_to_node_index) +"] = " + str(arr_hidden_layers_new[1][weight_layer_index][weight_node_index][weight_to_node_index]) )
+                        result += arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index]
+                        result += (float(momentum) * (arr_hidden_layers_new[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index] - \
+                                    arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index]))
+                        result += (float(learning_rate) * arr_grad[0][weight_layer_index - 1][weight_node_index])
+                        arr_hidden_layers_new[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index] = result
+                        print("AFTER UPDATE -> arr_hidden_layers_new[1]["+str(weight_layer_index) + "][" + str(weight_node_index) \
+                        + "][" + str(weight_to_node_index) +"] = " + str(arr_hidden_layers_new[1][weight_layer_index][weight_node_index][weight_to_node_index]) )
+
+
 
 
     print("AFTER.......")
