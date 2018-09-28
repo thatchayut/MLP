@@ -188,7 +188,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         print("data output(desired output)  : " + str(data_output))
         sse, arr_error = calculateError(arr_output_nodes, data_output)
-        return sse, arr_error
+        return arr_input_nodes, sse, arr_error
     else:
         print("cannot do FORWARDING!")
         print()
@@ -205,7 +205,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     # print("arr_output_nodes after reset : " + str(arr_output_nodes))
     # print("------------------------------------------------------------------------------------------------------")
 
-def backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, momentum, learning_rate,\
+def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, momentum, learning_rate,\
             number_of_classes):
     arr_output_merged = []
     arr_output_merged.append(arr_Y)
@@ -213,6 +213,7 @@ def backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad
     arr_grad = []
     arr_grad.append(arr_grad_hidden)
     arr_grad.append(arr_grad_output)
+    print("INPUT : " + str(arr_input_nodes_with_value))
     print("BEFORE.......")
     print("arr_Y : " + str(arr_Y))
     print("arr_output_merged" + str(arr_output_merged))
@@ -301,24 +302,40 @@ def backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad
     for list_index in range(0, len(arr_hidden_layers)):
         # weight at the last hidden layer -> output layer
         if(list_index == 0):
-            print("testtttttttttt")
             reversed_list_index = len(arr_hidden_layers) - list_index - 1
-            result = 0
             for weight_layer_index in range(0, len(arr_hidden_layers[reversed_list_index])):
                 for weight_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index])):
+                    result = 0
                     # for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index])):
                     print("BEFORE UPDATE -> arr_hidden_layers_new[2]["+str(weight_layer_index) + "][" + str(weight_node_index) + "]" \
                         + " = " + str(arr_hidden_layers_new[2][weight_layer_index][weight_node_index]) )
                     result += arr_hidden_layers[2][weight_layer_index][weight_node_index]
                     result += (float(momentum) * (arr_hidden_layers_new[2][weight_layer_index][weight_node_index] - arr_hidden_layers[2][weight_layer_index][weight_node_index]))
                     if(number_of_classes == "1"):
-                        result += (float(learning_rate) * arr_grad[1] * arr_Y[weight_layer_index - 1][weight_node_index])
+                        result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
                     else:
-                        result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[weight_layer_index - 1][weight_node_index])                
+                        result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])                
                     # #update weight
                     arr_hidden_layers_new[2][weight_layer_index][weight_node_index] = result
                     print("AFTER UPDATE -> arr_hidden_layers_new[2]["+str(weight_layer_index) + "][" + str(weight_node_index) + "]" \
                             + " = " + str(arr_hidden_layers_new[2][weight_layer_index][weight_node_index]))
+        # weight at an input layer -> the first hidden layer
+        elif(list_index == len(arr_hidden_layers) - 1):
+            reversed_list_index = len(arr_hidden_layers) - list_index - 1
+            for weight_node_index in range(0, len(arr_hidden_layers[reversed_list_index])):
+                for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index])):
+                    result = 0
+                    # for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_layer_index][weight_layer_index][weight_node_index])):
+                    print("BEFORE UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
+                    "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]) )
+                    result += arr_hidden_layers[0][weight_node_index][weight_to_node_index]
+                    result += (float(momentum) * (arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] - \
+                                arr_hidden_layers[0][weight_node_index][weight_to_node_index]))
+                    result += (float(learning_rate) * arr_grad[0][0][weight_node_index] * arr_input_nodes_with_value[weight_node_index])
+                    arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] = result
+                    print("AFTER UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
+                    "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]) )
+
 
     print("AFTER.......")
     print("arr_Y : " + str(arr_Y))
@@ -367,14 +384,14 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     print("                                           FORWARD                                                   ")
                     print("*****************************************************************************************************")
                     all_sse = []
-                    sse, arr_error = forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
+                    arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, element, arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
                     all_sse.append(sse)
 
                     print("*****************************************************************************************************")
                     print("                                           BACKWARD                                                   ")
                     print("*****************************************************************************************************")
-                    backward(arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
+                    backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
                     momentum, learning_rate, number_of_classes)
                     
                     #reset weight
