@@ -16,6 +16,7 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
     layer = []
     final = []
     count = 0
+    np.random.seed(1)
     while count < int(number_of_nodes):
         arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_features))
         first_layer.append(arr)
