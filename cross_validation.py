@@ -569,41 +569,41 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
                     # all_sse.append(sse)
 
-                    # print("*****************************************************************************************************")
-                    # print("                                           BACKWARD                                                   ")
-                    # print("*****************************************************************************************************")
-                    # backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
-                    # momentum, learning_rate, number_of_classes)
+                    print("*****************************************************************************************************")
+                    print("                                           BACKWARD                                                   ")
+                    print("*****************************************************************************************************")
+                    backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
+                    momentum, learning_rate, number_of_classes)
 
-                    # #reset arr_Y
-                    # for layer_index in range(0, len(arr_Y)):
-                    #     for node_index in range(0,len(arr_Y[layer_index])):
-                    #         arr_Y[layer_index][node_index] = 0
-                    # print("arr_Y after reset: " + str(arr_Y))
+                    #reset arr_Y
+                    for layer_index in range(0, len(arr_Y)):
+                        for node_index in range(0,len(arr_Y[layer_index])):
+                            arr_Y[layer_index][node_index] = 0
+                    print("arr_Y after reset: " + str(arr_Y))
 
-                    # #reset arr_output_nodes
-                    # for node_index in range(0, len(arr_output_nodes)):
-                    #     arr_output_nodes[node_index] = 0
+                    #reset arr_output_nodes
+                    for node_index in range(0, len(arr_output_nodes)):
+                        arr_output_nodes[node_index] = 0
                     
                     # #testing
-                    # # for test_element_index in range(0, len(test_part)):
-                    # # if(element_index == test_element_index):
-                    # print("*****************************************************************************************************")
-                    # print("                                           TESTING                                                   ")
-                    # print("*****************************************************************************************************")
-                    # print("arr_hidden_layers : " + str(arr_hidden_layers))
-                    # print("arr_hidden_layers_new : " + str(arr_hidden_layers_new))
-                    # print("arr_output_nodes : " + str(arr_output_nodes))
-                    # print("arr_Y : " + str(arr_Y))
-                    # all_sse = []
-                    # arr_input_nodes_with_value, sse, arr_error = testing(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
-                    # arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
-                    # all_sse.append(sse)
-                    # mse = calcualteMSE(all_sse, number_of_data_all)
-                    # print("MSE : " + str(mse))
+                    # for test_element_index in range(0, len(test_part)):
+                    # if(element_index == test_element_index):
+                    print("*****************************************************************************************************")
+                    print("                                           TESTING                                                   ")
+                    print("*****************************************************************************************************")
+                    print("arr_hidden_layers : " + str(arr_hidden_layers))
+                    print("arr_hidden_layers_new : " + str(arr_hidden_layers_new))
+                    print("arr_output_nodes : " + str(arr_output_nodes))
+                    print("arr_Y : " + str(arr_Y))
+                    all_sse = []
+                    arr_input_nodes_with_value, sse, arr_error = testing(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                    arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
+                    all_sse.append(sse)
+                    mse = calcualteMSE(all_sse, number_of_data_all)
+                    print("MSE : " + str(mse))
                     # #reset weight
-                    # arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
-                    # arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
+                    arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
+                    arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
                 
                     #reset arr_Y
                     for layer_index in range(0, len(arr_Y)):
@@ -635,6 +635,6 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
             #         arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
             #         all_sse.append(sse)
 
-        print("TEST------")
-        print(test_part)
-        print()
+        # print("TEST------")
+        # print(test_part)
+        # print()
