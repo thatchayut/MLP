@@ -25,15 +25,6 @@ def getInput():
         function = input("Function number : ")
         type(function)
         if ((function is  "1") or (function is  "2")):
-            # Check for additional arguments
-            # if ((function is "3") or (function is "4")):
-            #     beta = input("bata value : ")
-            #     type(beta)
-            #     while(beta.isnumeric() == False):
-            #         beta = input("bata value : ")
-            #         type(beta)
-            #     check = True
-            # else:
             beta = None
             check = True          
         else:
@@ -52,12 +43,21 @@ def getInput():
             check = True
         else:
             print("Invalid input ...")
+    check = False
+    print("Enter epoch ...")
+    while (check == False):
+        epoch = input("epoch : ")
+        type(epoch)
+        if((epoch.isnumeric() == True) and (int(epoch) >= 1)):
+            check = True
+        else:
+            print("Invalid input ...")
     return number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, \
-           learning_rate, momentum, beta, fold
+           learning_rate, momentum, beta, fold, epoch
 
 def main():
     #initialize network
-    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold = getInput()
+    number_of_features, number_of_layers, number_of_nodes, function, number_of_classes, learning_rate, momentum, beta, fold, epoch = getInput()
     arr_input_nodes = init.createInputNodes(number_of_features)
     arr_hidden_layers = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes) 
     arr_hidden_layers_new = init.createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,number_of_classes)
@@ -72,7 +72,7 @@ def main():
     arr_grad_hidden = init.createLocalGradHidden(number_of_nodes, number_of_layers)
     cv.crossValidation("flood-input.csv", "flood-output.csv", "flood-data-full.csv", fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
                           arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output,\
-                          number_of_features, number_of_layers, number_of_nodes, number_of_classes)
+                          number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch)
     # print("arr_hidden_layers : ")
     # print(arr_hidden_layers)
     # print("arr_hidden_layers_new : ")

@@ -47,16 +47,6 @@ def featureScaling(input_data, output_data):
 
     return normalized_input_data, normalized_output_data
 
-def featureScaleingForTesting(test_data):
-    noramalized_test_data = []
-    min_value = min(test_data)
-    max_value = max(test_data)
-    for element in test_data:
-        result = (element - min_value)/(max_value - min_value)
-        result = round(result, 5)
-        noramalized_test_data.append(result)
-    print("normalized_test_data : " + str(normalized_test_data))
-
 def chunks(l, n):
     # For item i in a range that is a length of l,
     for i in range(0, len(l), n):
@@ -165,39 +155,6 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print("arr_output_nodes : " + str(arr_output_nodes))
         print("arr_Y : " + str(arr_Y))
         print()
-        # previous version from here
-        # for layer_index in range(0, len(arr_Y) + 1):
-        #     # weight from an input layer to the 1st hidden layer
-        #     if (layer_index == 0):
-        #         for index in range(0, len(arr_Y[layer_index])):
-        #             for node_index in range(0, len(arr_hidden_layers[0])):
-        #                 for weight in arr_hidden_layers[0][node_index]:
-        #                     arr_Y[layer_index][index] += (weight * arr_input_nodes[node_index])
-        #                     arr_Y[layer_index][index] += (arr_weight_bias[layer_index][index] * arr_bias[layer_index][index])
-        #             # modify output using activation function
-        #             arr_Y[layer_index][index] = useFunction(arr_Y[layer_index][index], function_number, beta)
-        #     # calcualte output at the last hidden layer
-        #     elif (layer_index == (len(arr_Y))):
-        #         # print("testtttttttttttttttttttttt")
-        #         for output_index in range(0, len(arr_output_nodes)):
-        #             for index in range(0, len(arr_Y[layer_index - 1])):
-        #                 for node_index in range(0, len(arr_hidden_layers[2])):
-        #                     for weight in arr_hidden_layers[2][node_index]:
-        #                         arr_output_nodes[output_index] += (weight * arr_Y[layer_index - 1][index])
-        #             arr_output_nodes[output_index] += (arr_weight_bias_output[output_index] * arr_bias_output[output_index])
-        #             arr_output_nodes[output_index] = useFunction(arr_output_nodes[output_index], function_number, beta) 
-        #             print("arr_output_nodes[" + str(output_index) +"] : " + str(arr_output_nodes[output_index]))
-        #     else:
-        #     # calculate output for all nodes in hidden layers except the first layer connected to input node
-        #         for index in range(0, len(arr_Y[layer_index])):
-        #             for weight_layer in range(0, len(arr_hidden_layers[1])):
-        #                 for node_index in range(0, len(arr_hidden_layers[1][weight_layer])):
-        #                     for weigth_to_node in range(0, len(arr_hidden_layers[1][weight_layer][node_index])):
-        #                         # print("arr_Y[" + str(layer_index) + "][" + str(node_index) + "]")
-        #                         arr_Y[layer_index][index] += (arr_Y[layer_index - 1][node_index] * arr_hidden_layers[1][weight_layer][node_index][weigth_to_node])
-        #                         arr_Y[layer_index][index] += (arr_weight_bias[layer_index][index] * arr_bias[layer_index][index])
-        #         arr_Y[layer_index][index] = useFunction(arr_Y[layer_index][index], function_number, beta)
-        # previous version to here
         for layer_index in range(0, len(arr_Y) + 1):
             # calculate output
             if(layer_index == (len(arr_Y))):
@@ -262,18 +219,6 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     else:
         print("cannot do FORWARDING!")
         print()
-
-    # #reset arr_Y
-    # for layer_index in range(0, len(arr_Y)):
-    #     for node_index in range(0,len(arr_Y[layer_index])):
-    #         arr_Y[layer_index][node_index] = 0
-    # print("arr_Y after reset: " + str(arr_Y))
-
-    # #reset arr_output_nodes
-    # for node_index in range(0, len(arr_output_nodes)):
-    #     arr_output_nodes[node_index] = 0
-    # print("arr_output_nodes after reset : " + str(arr_output_nodes))
-    # print("------------------------------------------------------------------------------------------------------")
 
 def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, momentum, learning_rate,\
             number_of_classes):
@@ -440,14 +385,6 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
 
 def testing (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
             arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta):
-    # calculate min, max, mean to be used in feature scaling
-    min_value = data_all.min()
-    max_value = data_all.max()
-    mean_value = data_all.mean()
-    mean_value = round(mean_value, 5)
-    print("MIN from ALL : " + str(min_value[1]))
-    print("MAX from ALL : " + str(max_value[1]))
-    print("MEAN from ALL : " + str(mean_value[1]))
     # change number of line in to dataframe
     line = line - 2
     # print("line : " + str(line + 2))
@@ -536,7 +473,7 @@ def testing (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
 
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
                     arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output, \
-                    number_of_features, number_of_layers, number_of_nodes, number_of_classes):
+                    number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
     data_all, dataframe_all, number_of_data_all, arr_row_all = readFile(full_data_file)
@@ -561,29 +498,38 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 print(data_chunk_input[train_element_index])
                 print()
                 for element_index in range(0, len(data_chunk_input[train_element_index])):
-                    print("*****************************************************************************************************")
-                    print("                                           FORWARD                                                   ")
-                    print("*****************************************************************************************************")
-                    # all_sse = []
-                    arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, data_chunk_input[train_element_index][element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
-                    arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                    # all_sse.append(sse)
+                    all_sse = []
+                    for epoch_count in range(0, int(epoch)):
+                        print("*****************************************************************************************************")
+                        print("                                           FORWARD                                                   ")
+                        print("*****************************************************************************************************")
+                        arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, data_chunk_input[train_element_index][element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                        arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
+                        all_sse.append(sse)
 
-                    print("*****************************************************************************************************")
-                    print("                                           BACKWARD                                                   ")
-                    print("*****************************************************************************************************")
-                    backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
-                    momentum, learning_rate, number_of_classes)
+                        print("*****************************************************************************************************")
+                        print("                                           BACKWARD                                                   ")
+                        print("*****************************************************************************************************")
+                        arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers_new)
+                        print("arr_hidden_layers_template = ")
+                        print("arr_hidden_layers = ")
+                        print(str(arr_hidden_layers))
+                        print(str(arr_hidden_layers_template))
+                        backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
+                        momentum, learning_rate, number_of_classes)
+                        arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
+                        print("arr_hidden_layers = ")
+                        print(str(arr_hidden_layers))
 
-                    #reset arr_Y
-                    for layer_index in range(0, len(arr_Y)):
-                        for node_index in range(0,len(arr_Y[layer_index])):
-                            arr_Y[layer_index][node_index] = 0
-                    print("arr_Y after reset: " + str(arr_Y))
+                        #reset arr_Y
+                        for layer_index in range(0, len(arr_Y)):
+                            for node_index in range(0,len(arr_Y[layer_index])):
+                                arr_Y[layer_index][node_index] = 0
+                        print("arr_Y after reset: " + str(arr_Y))
 
-                    #reset arr_output_nodes
-                    for node_index in range(0, len(arr_output_nodes)):
-                        arr_output_nodes[node_index] = 0
+                        #reset arr_output_nodes
+                        for node_index in range(0, len(arr_output_nodes)):
+                            arr_output_nodes[node_index] = 0
                     
                     # #testing
                     # for test_element_index in range(0, len(test_part)):
@@ -595,7 +541,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     print("arr_hidden_layers_new : " + str(arr_hidden_layers_new))
                     print("arr_output_nodes : " + str(arr_output_nodes))
                     print("arr_Y : " + str(arr_Y))
-                    all_sse = []
+                    # all_sse = []
                     arr_input_nodes_with_value, sse, arr_error = testing(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
                     arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta)
                     all_sse.append(sse)
