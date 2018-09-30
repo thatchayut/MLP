@@ -4,11 +4,8 @@ import init_node as init
 import cross_validation as cv
 import math
 import copy
-
-def readFile(file):
-    doc = open(file, "r")
-    for line in doc:
-        print(line)
+import warnings
+warnings.simplefilter('ignore')
 
 def getInput():
     number_of_features = input("Number of features : ")

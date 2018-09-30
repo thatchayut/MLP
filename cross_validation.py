@@ -559,6 +559,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         print("Desired Output : " + str(data_output_template[0]))
                     print("all_sse : " + str(all_sse))
                     print("number of all sse : " + str(len(all_sse)))
+                    print("sum sse : " + str(sum(all_sse)))
                     mse = calcualteMSE(all_sse, len(test_part))
                     all_sse.clear()
                     all_mse.append(mse)
