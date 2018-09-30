@@ -4,11 +4,8 @@ import init_node as init
 import cross_validation as cv
 import math
 import copy
-
-def readFile(file):
-    doc = open(file, "r")
-    for line in doc:
-        print(line)
+import warnings
+warnings.simplefilter('ignore')
 
 def getInput():
     number_of_features = input("Number of features : ")
@@ -66,13 +63,18 @@ def main():
     # arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers)
     arr_Y = init.createY(number_of_nodes, number_of_layers)
     arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
+    arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
+    arr_weight_bias_template, arr_bias_output_template = init.createBias(number_of_nodes, number_of_layers)
     arr_output_nodes = init.createOutputNodes(number_of_classes)
     arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
+    arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
+    arr_weight_bias_output_template, arr_bias_output_template  =init.createBias(number_of_classes, 1)
     arr_grad_output = init.createLocalGradOutput(number_of_classes)
     arr_grad_hidden = init.createLocalGradHidden(number_of_nodes, number_of_layers)
     cv.crossValidation("flood-input.csv", "flood-output.csv", "flood-data-full.csv", fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
                           arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output,\
-                          number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch)
+                          number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch, arr_weight_bias_template, arr_weight_bias_output_template,  arr_weight_bias_new, \
+                          arr_weight_bias_output_new)
     # print("arr_hidden_layers : ")
     # print(arr_hidden_layers)
     # print("arr_hidden_layers_new : ")

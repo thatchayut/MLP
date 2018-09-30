@@ -52,6 +52,7 @@ def createBias(number_of_nodes,number_of_layers):
     node2 = []
     layer2 =[]
     bias = []
+    np.random.seed(1)
     #initial weight for each bias
     for layer_count in range(0,int(number_of_layers)):
         arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
