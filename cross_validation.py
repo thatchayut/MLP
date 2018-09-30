@@ -442,6 +442,15 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                         arr_hidden_layers_new[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index] = result
                         # print("AFTER UPDATE -> arr_hidden_layers_new[1]["+str(weight_layer_index) + "][" + str(weight_node_index) \
                         # + "][" + str(weight_to_node_index) +"] = " + str(arr_hidden_layers_new[1][weight_layer_index][weight_node_index][weight_to_node_index]) )
+            #update weight bias
+            for bias_layer_index in range(1, len(arr_weight_bias)):
+                for bias_node_index in range(0, len(arr_weight_bias[bias_layer_index])):
+                    result = 0
+                    result += arr_weight_bias[bias_layer_index][bias_node_index]
+                    result += (float(momentum) * (arr_weight_bias_new[bias_layer_index][bias_node_index] - arr_weight_bias[bias_layer_index][bias_node_index]))
+                    result += (float(learning_rate) * arr_grad[0][bias_layer_index - 1][bias_node_index])
+                    arr_weight_bias[bias_layer_index][bias_node_index] = result
+                                    
     # print("AFTER.......")
     # print("arr_Y : " + str(arr_Y))
     # print("arr_output_merged" + str(arr_output_merged))
