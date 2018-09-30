@@ -89,15 +89,16 @@ def main():
     # print("all layer : " + str(len(arr_hidden_layers)))
     # print("hidden : " + str(len(arr_hidden_layers[1])))
     # print("member in hidden : " + str(len(arr_hidden_layers[1][0])))
-    # print(arr_weight_bias)
     # print(arr_Y)
-    print("arr_weight_bias_output : " + str(arr_weight_bias_output))
-    print("arr_bias_output : " + str(arr_bias_output))
     print("arr_weight_bias : " + str(arr_weight_bias))
     print("arr_bias : " + str(arr_bias))
-    print("arr_grad_output : " + str(arr_grad_output))
-    print("arr_grad_hidden : " + str(arr_grad_hidden))
-    print()
+    print("arr_weight_bias_output : " + str(arr_weight_bias_output))
+    print("arr_bias_output : " + str(arr_bias_output))
+    # print("arr_weight_bias : " + str(arr_weight_bias))
+    # print("arr_bias : " + str(arr_bias))
+    # print("arr_grad_output : " + str(arr_grad_output))
+    # print("arr_grad_hidden : " + str(arr_grad_hidden))
+    # print()
 
 
 if __name__ == '__main__':
