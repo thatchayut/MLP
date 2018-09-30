@@ -261,7 +261,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print()
 
 def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, momentum, learning_rate,\
-            number_of_classes):
+            number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new):
     arr_output_merged = []
     arr_output_merged.append(arr_Y)
     arr_output_merged.append(arr_output_nodes)
@@ -371,10 +371,36 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                         result = round(result,8)
                     else:
                         result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])                
+                        result = round(result,8)
                     # #update weight
                     arr_hidden_layers_new[2][weight_layer_index][weight_node_index] = result
                     # print("AFTER UPDATE -> arr_hidden_layers_new[2]["+str(weight_layer_index) + "][" + str(weight_node_index) + "]" \
                             # + " = " + str(arr_hidden_layers_new[2][weight_layer_index][weight_node_index]))
+            # update weight for bias
+            if(number_of_classes == "1"):
+                for bias_node_index in range(0, len(arr_weight_bias_output)):
+                    result = 0
+                    result += (arr_weight_bias_output[bias_node_index] ) 
+                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index]  - arr_weight_bias_output[bias_node_index] ))
+                    # if(number_of_classes == "1"):
+                    result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
+                    # result = round(result,8)
+                    arr_weight_bias_output_new = result
+                # else:
+                # result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])
+            else:
+                for bias_node_index in range(0, len(arr_weight_bias_output)):
+                    result = 0
+                    result += (arr_weight_bias_output[bias_node_index]) 
+                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index] - arr_weight_bias_output[bias_node_index]))
+                    # if(number_of_classes == "1"):
+                    #     result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
+                    #     result = round(result,8)
+                    # else:
+                    result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])
+                    # result = round(result,8)
+                    arr_weight_bias_output_new[bias_node_index] = result
+            
         # weight at an input layer -> the first hidden layer
         elif(list_index == len(arr_hidden_layers) - 1):
             reversed_list_index = len(arr_hidden_layers) - list_index - 1
@@ -391,6 +417,15 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] = result
                     # print("AFTER UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
                     # "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]))
+            # update weight bias
+            for bias_node_index in range(0, len(arr_weight_bias[0])):
+                result = 0
+                result += arr_weight_bias[0][bias_node_index]
+                result += (float(momentum) * (arr_weight_bias_new[0][bias_node_index] - \
+                            arr_weight_bias[0][bias_node_index]))
+                result += (float(learning_rate) * arr_grad[0][0][bias_node_index] * arr_input_nodes_with_value[bias_node_index])
+                arr_weight_bias_new[0][bias_node_index] = result
+
         # weight at hidden layer -> hidden layer
         else:
             reversed_list_index = len(arr_hidden_layers) - list_index - 1
@@ -425,7 +460,8 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
 
 def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
                     arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output, \
-                    number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch):
+                    number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch, arr_weight_bias_template, arr_weight_bias_output_template, \
+                     arr_weight_bias_new, arr_weight_bias_output_new):
     data_input, dataframe_input, number_of_data_input, arr_row_input = readFile(input_file)
     data_output, dataframe_output, number_of_data_output, arr_row_output = readFile(output_file)
     data_all, dataframe_all, number_of_data_all, arr_row_all = readFile(full_data_file)
@@ -468,13 +504,17 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         # print("                                           BACKWARD                                                   ")
                         # print("*****************************************************************************************************")
                         arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers_new)
+                        arr_weight_bias_output_template = copy.deepcopy(arr_weight_bias_output_new)
+                        arr_weight_bias_template = copy.deepcopy(arr_weight_bias_new)
                         # print("arr_hidden_layers_template = ")
                         # print("arr_hidden_layers = ")
                         # print(str(arr_hidden_layers))
                         # print(str(arr_hidden_layers_template))
                         backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
-                        momentum, learning_rate, number_of_classes)
+                        momentum, learning_rate, number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new)
                         arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
+                        arr_weight_bias_output = copy.deepcopy(arr_weight_bias_output_template)
+                        arr_weight_bias = copy.deepcopy(arr_weight_bias_template)
                         # print("arr_hidden_layers = ")
                         # print(str(arr_hidden_layers))
 
@@ -519,7 +559,10 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # #reset weight
                     arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
                     arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
-                
+                    arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
+                    arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
+                    arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
+                    arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
                     #reset arr_Y
                     for layer_index in range(0, len(arr_Y)):
                         for node_index in range(0,len(arr_Y[layer_index])):
