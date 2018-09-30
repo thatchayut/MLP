@@ -47,6 +47,28 @@ def featureScaling(input_data, output_data):
 
     return normalized_input_data, normalized_output_data
 
+def convertBack(value, input_data, output_data):
+    merged_data = [] 
+    merged_data.extend(input_data)
+    merged_data.extend(output_data)
+    # print("merged_data" + str(merged_data))
+    min_value = min(merged_data)
+    max_value = max(merged_data)
+
+    new_value = (value * (max_value - min_value)) + min_value
+    return new_value
+
+def normalizeError(value, input_data, output_data):
+    merged_data = [] 
+    merged_data.extend(input_data)
+    merged_data.extend(output_data)
+    # print("merged_data" + str(merged_data))
+    min_value = min(merged_data)
+    max_value = max(merged_data)
+
+    new_value = (value - min_value)/(max_value - min_value)
+    return new_value
+
 def chunks(l, n):
     # For item i in a range that is a length of l,
     for i in range(0, len(l), n):
@@ -99,10 +121,12 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     line = line - 2
     # print("line : " + str(line + 2))
     data_input = dataframe_input.iloc[line]
+    data_input_template = copy.deepcopy(data_input)
     # print(data_input)
     # data_input = featureScaling(data_input)
     # print(data_input)
     data_output = dataframe_output.iloc[line]
+    data_output_template = copy.deepcopy(data_output)
     # print(data_output)
     # data_output = featureScaling(data_output)
     data_input, data_output = featureScaling(data_input, data_output)
@@ -210,8 +234,25 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         # print("arr_Y" + str(arr_Y))
         # print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         # print("data output(desired output)  : " + str(data_output))
-        sse, arr_error = calculateError(arr_output_nodes, data_output)
-        return arr_input_nodes, sse, arr_error
+        converted_arr_output_node = []
+        for element_index in range(0, len(arr_output_nodes)):
+            converted_value = convertBack(arr_output_nodes[element_index], data_input_template, data_output_template)
+            converted_arr_output_node.append(converted_value)
+        # print("output : " + str(converted_arr_output_node))
+
+        sse, arr_error = calculateError(converted_arr_output_node, data_output_template)
+        # print("sse = " + str(sse))
+        converted_arr_output_node.clear()
+        
+        #normalize error
+        normalized_arr_error = []
+        for element_index in range(0, len(arr_error)):
+            error = normalizeError(arr_error[element_index], data_input_template, data_output_template)
+            normalized_arr_error.append(error)
+
+        # sse, arr_error = calculateError(arr_output_nodes, data_output)
+        # return arr_input_nodes, sse, arr_error
+        return arr_input_nodes, sse, normalized_arr_error
     else:
         print("cannot do FORWARDING!")
         print()
@@ -397,6 +438,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
     # test and train
     count = 0
     for test_element in data_chunk_input:
+        all_mse = []
         count += 1
         print("------------------------------" + str(count) + " fold ------------------------------")
         test_part = test_element
@@ -453,11 +495,16 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("arr_output_nodes : " + str(arr_output_nodes))
                     # print("arr_Y : " + str(arr_Y))
                     # all_sse = []
-                    arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
-                    arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                    all_sse.append(sse)
-                    mse = calcualteMSE(all_sse, int(epoch))
-                    print("MSE (" + str(element_index) + ") : " + str(mse))
+                    # all_mse = []
+                    if (element_index < len(test_part)):
+                        print("test_part[" + str(element_index) + "] = " +str(test_part[element_index]))
+                        arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                        arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
+                        all_sse.append(sse)
+                        mse = calcualteMSE(all_sse, int(epoch))
+                        all_mse.append(mse)
+                        print("MSE (" + str(element_index) + ") : " + str(mse))
+
                     # #reset weight
                     arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
                     arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
@@ -474,6 +521,8 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
 
                     # print("arr_output_nodes after reset : " + str(arr_output_nodes))
                     print("------------------------------------------------------------------------------------------------------")
+        print("Minimum MSE : " + str(min(all_mse)))      
+        print()
                 # mse = calcualteMSE(all_sse, number_of_data_all)
                 # print("MSE : " + str(mse))
                 # print("arr_hidden_layers : ")
