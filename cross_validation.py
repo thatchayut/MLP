@@ -90,7 +90,7 @@ def calculateError(actual_output, desired_output):
     sse = 0
     for index in range(0, len(actual_output)):
         error_value = (desired_output[index] - actual_output[index])
-        error_percentage = ((error_value/actual_output[index]) * 100)
+        # error_percentage = ((error_value/actual_output[index]) * 100)
         arr_error.append(error_value)
         # print("absolute error of output #" + str(index) + " = " + str(error_value) + "(" + str(error_percentage) + " %)")
     # print("arr _error : " + str(arr_error))
@@ -100,11 +100,11 @@ def calculateError(actual_output, desired_output):
     # print("sse : " + str(sse))
     return sse, arr_error
 
-def calcualteMSE(arr_error, epoch):
+def calcualteMSE(arr_error, size):
     result = 0
     for element in arr_error:
         result += element
-    result = result/epoch
+    result = result/size
     return result
 
 def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes, arr_output_nodes, arr_Y, arr_hidden_layers,\
@@ -238,10 +238,13 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         for element_index in range(0, len(arr_output_nodes)):
             converted_value = convertBack(arr_output_nodes[element_index], data_input_template, data_output_template)
             converted_arr_output_node.append(converted_value)
-        # print("output : " + str(converted_arr_output_node))
+        # print("actual output : " + str(converted_arr_output_node))
+        # print("desired output : " + str(data_output_template) )
 
         sse, arr_error = calculateError(converted_arr_output_node, data_output_template)
+        # print("SSE = " + str(sse))
         # print("sse = " + str(sse))
+        predicted_output = copy.deepcopy(converted_arr_output_node)
         converted_arr_output_node.clear()
         
         #normalize error
@@ -252,7 +255,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
 
         # sse, arr_error = calculateError(arr_output_nodes, data_output)
         # return arr_input_nodes, sse, arr_error
-        return arr_input_nodes, sse, normalized_arr_error
+        return arr_input_nodes, sse, normalized_arr_error, predicted_output, data_output_template
     else:
         print("cannot do FORWARDING!")
         print()
@@ -439,6 +442,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
     count = 0
     for test_element in data_chunk_input:
         all_mse = []
+        # all_sse = []
         count += 1
         print("------------------------------" + str(count) + " fold ------------------------------")
         test_part = test_element
@@ -451,14 +455,14 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 print(test_part)
                 print()
                 for element_index in range(0, len(data_chunk_input[train_element_index])):
-                    all_sse = []
+                    # all_sse = []
                     for epoch_count in range(0, int(epoch)):
                         # print("*****************************************************************************************************")
                         # print("                                           FORWARD                                                   ")
                         # print("*****************************************************************************************************")
-                        arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, data_chunk_input[train_element_index][element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                        arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, data_chunk_input[train_element_index][element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
                         arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                        all_sse.append(sse)
+                        # all_sse.append(sse)
 
                         # print("*****************************************************************************************************")
                         # print("                                           BACKWARD                                                   ")
@@ -495,15 +499,21 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("arr_output_nodes : " + str(arr_output_nodes))
                     # print("arr_Y : " + str(arr_Y))
                     # all_sse = []
-                    # all_mse = []
-                    if (element_index < len(test_part)):
-                        print("test_part[" + str(element_index) + "] = " +str(test_part[element_index]))
-                        arr_input_nodes_with_value, sse, arr_error = forward(dataframe_input, dataframe_output, data_all, test_part[element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                    all_sse = []
+                    for test_element_index in range(0, len(test_part)):
+                    # if (element_index < len(test_part)):
+                        print("test_part[" + str(element_index) + "] = " +str(test_part[test_element_index]))
+                        arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, test_part[test_element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
                         arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
                         all_sse.append(sse)
-                        mse = calcualteMSE(all_sse, int(epoch))
-                        all_mse.append(mse)
-                        print("MSE (" + str(element_index) + ") : " + str(mse))
+                        print("Predicted : " + str(predicted_output))
+                        print("Desired Output : " + str(data_output_template[0]))
+                    print("all_sse : " + str(all_sse))
+                    print("number of all sse : " + str(len(all_sse)))
+                    mse = calcualteMSE(all_sse, len(test_part))
+                    all_mse.append(mse)
+                    print("MSE : " + str(mse))
+                    # print("MSE (" + str(element_index) + ") : " + str(mse))
 
                     # #reset weight
                     arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
@@ -521,6 +531,10 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
 
                     # print("arr_output_nodes after reset : " + str(arr_output_nodes))
                     print("------------------------------------------------------------------------------------------------------")
+        # print("Number of test data : " + str(len(test_part)))
+        # print("all_sse : " + str(len(all_sse)))
+        # mse = calcualteMSE(all_sse, len(test_part))
+        # print("MSE = " + str(mse))
         print("Minimum MSE : " + str(min(all_mse)))      
         print()
                 # mse = calcualteMSE(all_sse, number_of_data_all)
