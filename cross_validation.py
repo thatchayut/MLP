@@ -212,8 +212,18 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
                 # for arr_Y_node_index in range(0, len(arr_Y[0])):
                 for weight_node_index in range(0, len(arr_hidden_layers[0])):
                     result = 0
-                    for weight_to_node_index in range(0, len(arr_hidden_layers[0][weight_node_index])):
-                        result += (arr_input_nodes[weight_node_index] * arr_hidden_layers[0][weight_node_index][weight_to_node_index])
+                    print(len(arr_hidden_layers[0]))
+                    print("arr_hidden_layers[0] = " + str(arr_hidden_layers[0]))
+                    print("arr_input_nodes = " + str(arr_input_nodes))
+                    if(number_of_classes == "1"):
+                        for weight_to_node_index in range(0, len(arr_hidden_layers[0][weight_node_index])):
+                            print("arr_input_nodes[weight_node_index] = " + str(arr_input_nodes[weight_node_index]))
+                            result += (arr_input_nodes[weight_node_index] * arr_hidden_layers[0][weight_node_index][weight_to_node_index])
+                    else:
+                         for arr_input_index in range(0, len(arr_input_nodes)):
+                            for weight_to_node_index in range(0, len(arr_hidden_layers[0][weight_node_index])):
+                                print("arr_input_nodes[arr_input_index] = " + str(arr_input_nodes[arr_input_index]))
+                                result += (arr_input_nodes[arr_input_index] * arr_hidden_layers[0][weight_node_index][weight_to_node_index])
                     result += (arr_bias[0][weight_node_index] * arr_weight_bias[0][weight_node_index])
                     arr_Y[0][weight_node_index] = result
                     # print("BEFORE -> arr_Y[0][" + str(weight_node_index) + "] = " + str(arr_Y[0][weight_node_index]))
@@ -274,10 +284,10 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
     arr_output_merged.append(arr_Y)
     arr_output_merged.append(arr_output_nodes)
     arr_grad = []
-    print("arr_grad_output" + str(arr_grad_output))
+    # print("arr_grad_output" + str(arr_grad_output))
     arr_grad.append(arr_grad_hidden)
     arr_grad.append(arr_grad_output)
-    print("arr_grad = " +str(arr_grad))
+    # print("arr_grad = " +str(arr_grad))
     # print("INPUT : " + str(arr_input_nodes_with_value))
     # print("BEFORE.......")
     # print("arr_Y : " + str(arr_Y))
@@ -307,7 +317,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     else:
                         arr_grad[len(arr_grad) - list_index - 1][output_index] = arr_error[output_index] * ( 2 * arr_output_nodes[output_index] * \
                                         (1 - arr_output_nodes[output_index]))
-            print("arr_grad after output calculation: " + str(arr_grad))
+            # print("arr_grad after output calculation: " + str(arr_grad))
         #in case of hidden layers
         else:
             reversed_layer_index = len(arr_grad) - list_index - 1
@@ -531,7 +541,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 print(test_part)
                 print()
                 for element_index in range(0, len(data_chunk_input[train_element_index])):
-                    print("testtttt")
+                    # print("testtttt")
                     # all_sse = []
                     for epoch_count in range(0, int(epoch)):
                         # print("*****************************************************************************************************")
@@ -588,10 +598,11 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
                         all_sse.append(sse)
                         print("Predicted : " + str(predicted_output))
-                        print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
-                    print("all_sse : " + str(all_sse))
-                    print("number of all sse : " + str(len(all_sse)))
-                    print("sum sse : " + str(sum(all_sse)))
+                        # print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
+                        print("Desired Output:" + str(data_output_template[0]) + "  " + str(data_output_template[1]))
+                    # print("all_sse : " + str(all_sse))
+                    # print("number of all sse : " + str(len(all_sse)))
+                    # print("sum sse : " + str(sum(all_sse)))
                     mse = calcualteMSE(all_sse, len(test_part))
                     all_sse.clear()
                     all_mse.append(mse)
