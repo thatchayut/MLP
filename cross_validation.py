@@ -279,8 +279,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         print()
 
 def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, momentum, learning_rate,\
-            number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new, arr_hidden_layers_template, arr_weight_bias_output_template, \
-            arr_weight_bias_template):
+            number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new):
     arr_output_merged = []
     arr_output_merged.append(arr_Y)
     arr_output_merged.append(arr_output_nodes)
@@ -413,7 +412,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     # print("BEFORE UPDATE -> arr_hidden_layers_new[2]["+str(weight_layer_index) + "][" + str(weight_node_index) + "]" \
                         # + " = " + str(arr_hidden_layers_new[2][weight_layer_index][weight_node_index]) )
                     result += arr_hidden_layers[2][weight_layer_index][weight_node_index]
-                    result += (float(momentum) * (arr_hidden_layers_new[2][weight_layer_index][weight_node_index] - arr_hidden_layers_template[2][weight_layer_index][weight_node_index]))
+                    result += (float(momentum) * (arr_hidden_layers_new[2][weight_layer_index][weight_node_index] - arr_hidden_layers[2][weight_layer_index][weight_node_index]))
                     if(number_of_classes == "1"):
                         result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
                         result = round(result,8)
@@ -432,7 +431,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 for bias_node_index in range(0, len(arr_weight_bias_output)):
                     result = 0
                     result += (arr_weight_bias_output[bias_node_index] ) 
-                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index]  - arr_weight_bias_output_template[bias_node_index] ))
+                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index]  - arr_weight_bias_output[bias_node_index] ))
                     # if(number_of_classes == "1"):
                     result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
                     # result = round(result,8)
@@ -443,7 +442,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 for bias_node_index in range(0, len(arr_weight_bias_output)):
                     result = 0
                     result += (arr_weight_bias_output[bias_node_index]) 
-                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index] - arr_weight_bias_output_template[bias_node_index]))
+                    result += (float(momentum) * (arr_weight_bias_output_new[bias_node_index] - arr_weight_bias_output[bias_node_index]))
                     # if(number_of_classes == "1"):
                     #     result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
                     #     result = round(result,8)
@@ -464,7 +463,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     # "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]) )
                     result += arr_hidden_layers[0][weight_node_index][weight_to_node_index]
                     result += (float(momentum) * (arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] - \
-                                arr_hidden_layers_template[0][weight_node_index][weight_to_node_index]))
+                                arr_hidden_layers[0][weight_node_index][weight_to_node_index]))
                     # print("arr_input_nodes_with_value[weight_node_index] : " +str(arr_input_nodes_with_value[weight_to_node_index]))
                     result += (float(learning_rate) * arr_grad[0][0][weight_node_index] * arr_input_nodes_with_value[weight_to_node_index])
                     arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] = result
@@ -476,7 +475,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 result = 0
                 result += arr_weight_bias[0][bias_node_index]
                 result += (float(momentum) * (arr_weight_bias_new[0][bias_node_index] - \
-                            arr_weight_bias_template[0][bias_node_index]))
+                            arr_weight_bias[0][bias_node_index]))
                 if(bias_node_index < len(arr_input_nodes_with_value)):
                     result += (float(learning_rate) * arr_grad[0][0][bias_node_index] * arr_input_nodes_with_value[bias_node_index])
                 arr_weight_bias_new[0][bias_node_index] = result
@@ -493,7 +492,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                         # + "][" + str(weight_to_node_index) +"] = " + str(arr_hidden_layers_new[1][weight_layer_index][weight_node_index][weight_to_node_index]) )
                         result += arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index]
                         result += (float(momentum) * (arr_hidden_layers_new[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index] - \
-                                    arr_hidden_layers_template[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index]))
+                                    arr_hidden_layers[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index]))
                         result += (float(learning_rate) * arr_grad[0][weight_layer_index - 1][weight_node_index])
                         arr_hidden_layers_new[reversed_list_index][weight_layer_index][weight_node_index][weight_to_node_index] = result
                         # print("AFTER UPDATE -> arr_hidden_layers_new[1]["+str(weight_layer_index) + "][" + str(weight_node_index) \
@@ -503,7 +502,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 for bias_node_index in range(0, len(arr_weight_bias[bias_layer_index])):
                     result = 0
                     result += arr_weight_bias[bias_layer_index][bias_node_index]
-                    result += (float(momentum) * (arr_weight_bias_new[bias_layer_index][bias_node_index] - arr_weight_bias_template[bias_layer_index][bias_node_index]))
+                    result += (float(momentum) * (arr_weight_bias_new[bias_layer_index][bias_node_index] - arr_weight_bias[bias_layer_index][bias_node_index]))
                     result += (float(learning_rate) * arr_grad[0][bias_layer_index - 1][bias_node_index])
                     arr_weight_bias[bias_layer_index][bias_node_index] = result
     print("AFTER -> arr_hideen_layers_new : " +str(arr_hidden_layers_new) )                           
@@ -564,7 +563,6 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         # print("*****************************************************************************************************")
                         arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, data_chunk_input[train_element_index][element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
                         arr_hidden_layers, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                        print("arr_error = " + str(arr_error) )
                         # all_sse.append(sse)
 
                         # print("*****************************************************************************************************")
@@ -578,21 +576,13 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         # print(str(arr_hidden_layers))
                         # print(str(arr_hidden_layers_template))
                         backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
-                        momentum, learning_rate, number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new, arr_hidden_layers_template, \
-                        arr_weight_bias_output_template, arr_weight_bias_template)
-                       
+                        momentum, learning_rate, number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new)
                         arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers)
                         arr_weight_bias_output_template = copy.deepcopy(arr_weight_bias_output)
                         arr_weight_bias_template = copy.deepcopy(arr_weight_bias)
-                        
-                        arr_hidden_layers = copy.deepcopy(arr_hidden_layers_new)
-                        arr_weight_bias_output = copy.deepcopy(arr_weight_bias_output_new)
-                        arr_weight_bias = copy.deepcopy(arr_weight_bias_new)
-
-                        # arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
-                        # arr_weight_bias_output = copy.deepcopy(arr_weight_bias_output_template)
-                        # arr_weight_bias = copy.deepcopy(arr_weight_bias_template)
-                       
+                        arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
+                        arr_weight_bias_output = copy.deepcopy(arr_weight_bias_output_template)
+                        arr_weight_bias = copy.deepcopy(arr_weight_bias_template)
                         # print("arr_hidden_layers = ")
                         # print(str(arr_hidden_layers))
 
