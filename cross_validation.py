@@ -120,7 +120,10 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     # change number of line in to dataframe
     line = line - 2
     # print("line : " + str(line + 2))
+    # print("line:" + str(line))
+    # print("dataframe_input : "  + str(dataframe_input))
     data_input = dataframe_input.iloc[line]
+    # print("dataframe_input.iloc[line]" + str(dataframe_input.iloc[line].to_string(header=None,index=False)))
     data_input_template = copy.deepcopy(data_input)
     # print(data_input)
     # data_input = featureScaling(data_input)
@@ -174,7 +177,7 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         # print("BEFORE...")
         # print("arr_output_nodes : " + str(arr_output_nodes))
         # print("arr_Y : " + str(arr_Y))
-        # print()
+        print(arr_output_nodes)
         for layer_index in range(0, len(arr_Y) + 1):
             # calculate output
             if(layer_index == (len(arr_Y))):
@@ -193,8 +196,13 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
                         for weight_node_index in range(0, len(arr_hidden_layers[2])):
                             result = 0
                             for weight_to_node_index in range(0, len(arr_hidden_layers[2][weight_node_index])):
+                                # print("arr_hidden_layers[2][" + str(weight_node_index) + "][" + str(weight_to_node_index) + "] = " + str((arr_hidden_layers[2][weight_node_index][weight_to_node_index])))
+                                # print("arr_Y[" + str(len(arr_Y) - 1) + "][" + str(weight_node_index) + "] = " + str(arr_hidden_layers[2][weight_node_index][weight_to_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index]))
+                                # print("arr_weight_bias_output[0][" + str(output_index) +"] = " + str(arr_weight_bias_output[0][output_index]))
+                                # print("arr_weight_bias_output = " + str(arr_weight_bias_output))
                                 result += (arr_hidden_layers[2][weight_node_index][weight_to_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])
-                                result += (arr_weight_bias_output[output_index] * arr_bias_output[output_index])
+                                result += (arr_weight_bias_output[0][output_index]* arr_bias_output[0][output_index])
+                                # print(result)
                             arr_output_nodes[output_index] = result
                             # print("arr_output_nodes[" +  str(output_index) + "] = " + str(arr_output_nodes[output_index]))
                             arr_output_nodes[output_index] = useFunction(arr_output_nodes[output_index], function_number, beta)
@@ -266,8 +274,10 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
     arr_output_merged.append(arr_Y)
     arr_output_merged.append(arr_output_nodes)
     arr_grad = []
+    print("arr_grad_output" + str(arr_grad_output))
     arr_grad.append(arr_grad_hidden)
     arr_grad.append(arr_grad_output)
+    print("arr_grad = " +str(arr_grad))
     # print("INPUT : " + str(arr_input_nodes_with_value))
     # print("BEFORE.......")
     # print("arr_Y : " + str(arr_Y))
@@ -282,14 +292,22 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
             # in case of using Sigmoid function
             if(function_number == "1"):
                 for output_index in range(0, len(arr_output_nodes)):
-                    arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * arr_output_nodes[output_index] * \
-                                                               (1 - arr_output_nodes[output_index])
+                    if(number_of_classes == "1"):
+                        arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * arr_output_nodes[output_index] * \
+                                                                (1 - arr_output_nodes[output_index])
+                    else:
+                        arr_grad[len(arr_grad) - list_index - 1][output_index] = arr_error[output_index] * arr_output_nodes[output_index] * \
+                                        (1 - arr_output_nodes[output_index])
             # in case of using Hyperbolic Tangent function
             elif(function_number == "2"):
                 for output_index in range(0, len(arr_output_nodes)):
-                    arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * ( 2 * arr_output_nodes[output_index] * \
+                    if(number_of_classes == "1"):
+                        arr_grad[len(arr_grad) - list_index - 1] = arr_error[output_index] * ( 2 * arr_output_nodes[output_index] * \
                                                                (1 - arr_output_nodes[output_index]))
-
+                    else:
+                        arr_grad[len(arr_grad) - list_index - 1][output_index] = arr_error[output_index] * ( 2 * arr_output_nodes[output_index] * \
+                                        (1 - arr_output_nodes[output_index]))
+            print("arr_grad after output calculation: " + str(arr_grad))
         #in case of hidden layers
         else:
             reversed_layer_index = len(arr_grad) - list_index - 1
@@ -308,7 +326,9 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                                 if(number_of_classes == "1"):
                                     sum += weight * arr_grad[next_reversed_layer_index]
                                 else:
-                                    sum += weight * arr_grad[next_reversed_layer_index][grad_node_index]
+                                    for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
+                                        for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
+                                            sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                     elif(function_number == "2"):
                         for grad_node_index in range(0, len(arr_grad[reversed_layer_index][reversed_grad_layer_index])):
@@ -317,11 +337,19 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                             sum = 0
                             next_reversed_layer_index = reversed_layer_index + 1
                             # for grad_output_node in range(0, len(arr_grad[next_reversed_layer_index])):
-                            for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
-                                if(number_of_classes == "1"):
+                            if(number_of_classes == "1"):
+                                for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
+                                    # if(number_of_classes == "1"):
                                     sum += weight * arr_grad[next_reversed_layer_index]
-                                else:
-                                    sum += weight * arr_grad[next_reversed_layer_index][grad_node_index]
+                            else:
+                                for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
+                                    for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
+                                        # print(arr_grad)
+                                        # print("weight = " +str(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index]))
+                                        # print("arr_grad[" + str(next_reversed_layer_index) + "] = " +str(arr_grad[next_reversed_layer_index]))
+                                        # print("arr_grad[" + str(next_reversed_layer_index) +"][" + str(grad_node_index) +"] = " +str(arr_grad[next_reversed_layer_index][grad_node_index]))
+                                        sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
+                                        # print("sum = " + str(sum))
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                 # Input layer -> First Hidden layer 
                 else:
@@ -370,8 +398,11 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                         result += (float(learning_rate) * arr_grad[1] * arr_Y[len(arr_Y) - 1][weight_node_index])
                         result = round(result,8)
                     else:
-                        result += (float(learning_rate) * arr_grad[1][weight_node_index] * arr_Y[len(arr_Y) - 1][weight_node_index])                
-                        result = round(result,8)
+                        for grad_node_index in range(0, len(arr_grad[1])):
+                            if(weight_node_index == grad_node_index):
+                                print("arr_grad[1][grad_node_index] = " +str(arr_grad[1][grad_node_index]) )
+                                result += (float(learning_rate) * arr_grad[1][grad_node_index] * arr_Y[len(arr_Y) - 1][grad_node_index])                
+                                result = round(result,8)
                     # #update weight
                     arr_hidden_layers_new[2][weight_layer_index][weight_node_index] = result
                     # print("AFTER UPDATE -> arr_hidden_layers_new[2]["+str(weight_layer_index) + "][" + str(weight_node_index) + "]" \
@@ -500,6 +531,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 print(test_part)
                 print()
                 for element_index in range(0, len(data_chunk_input[train_element_index])):
+                    print("testtttt")
                     # all_sse = []
                     for epoch_count in range(0, int(epoch)):
                         # print("*****************************************************************************************************")
@@ -556,7 +588,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
                         all_sse.append(sse)
                         print("Predicted : " + str(predicted_output))
-                        print("Desired Output : " + str(data_output_template[0]))
+                        print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
                     print("all_sse : " + str(all_sse))
                     print("number of all sse : " + str(len(all_sse)))
                     print("sum sse : " + str(sum(all_sse)))
