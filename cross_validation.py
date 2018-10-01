@@ -647,6 +647,7 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
         # print("MSE = " + str(mse))
         print("Minimum MSE : " + str(min(all_mse)))      
         print()
+        print()
                 # mse = calcualteMSE(all_sse, number_of_data_all)
                 # print("MSE : " + str(mse))
                 # print("arr_hidden_layers : ")
