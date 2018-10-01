@@ -212,17 +212,17 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
                 # for arr_Y_node_index in range(0, len(arr_Y[0])):
                 for weight_node_index in range(0, len(arr_hidden_layers[0])):
                     result = 0
-                    print(len(arr_hidden_layers[0]))
-                    print("arr_hidden_layers[0] = " + str(arr_hidden_layers[0]))
-                    print("arr_input_nodes = " + str(arr_input_nodes))
+                    # print(len(arr_hidden_layers[0]))
+                    # print("arr_hidden_layers[0] = " + str(arr_hidden_layers[0]))
+                    # print("arr_input_nodes = " + str(arr_input_nodes))
                     if(number_of_classes == "1"):
                         for weight_to_node_index in range(0, len(arr_hidden_layers[0][weight_node_index])):
-                            print("arr_input_nodes[weight_node_index] = " + str(arr_input_nodes[weight_node_index]))
+                            # print("arr_input_nodes[weight_node_index] = " + str(arr_input_nodes[weight_node_index]))
                             result += (arr_input_nodes[weight_node_index] * arr_hidden_layers[0][weight_node_index][weight_to_node_index])
                     else:
                          for arr_input_index in range(0, len(arr_input_nodes)):
                             for weight_to_node_index in range(0, len(arr_hidden_layers[0][weight_node_index])):
-                                print("arr_input_nodes[arr_input_index] = " + str(arr_input_nodes[arr_input_index]))
+                                # print("arr_input_nodes[arr_input_index] = " + str(arr_input_nodes[arr_input_index]))
                                 result += (arr_input_nodes[arr_input_index] * arr_hidden_layers[0][weight_node_index][weight_to_node_index])
                     result += (arr_bias[0][weight_node_index] * arr_weight_bias[0][weight_node_index])
                     arr_Y[0][weight_node_index] = result
@@ -336,6 +336,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                                 if(number_of_classes == "1"):
                                     sum += weight * arr_grad[next_reversed_layer_index]
                                 else:
+                                    # print("arr_grad = " + str(arr_grad))
                                     for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
                                         for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
                                             sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
@@ -346,20 +347,26 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                             (2 * arr_Y[reversed_grad_layer_index][grad_node_index] * (1 - arr_Y[reversed_grad_layer_index][grad_node_index]))
                             sum = 0
                             next_reversed_layer_index = reversed_layer_index + 1
+                            # print("next_reversed_layer_index = " + str(next_reversed_layer_index))
                             # for grad_output_node in range(0, len(arr_grad[next_reversed_layer_index])):
                             if(number_of_classes == "1"):
                                 for weight in arr_hidden_layers[len(arr_hidden_layers) - 1]:
                                     # if(number_of_classes == "1"):
                                     sum += weight * arr_grad[next_reversed_layer_index]
                             else:
-                                for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
-                                    for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
-                                        # print(arr_grad)
-                                        # print("weight = " +str(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index]))
-                                        # print("arr_grad[" + str(next_reversed_layer_index) + "] = " +str(arr_grad[next_reversed_layer_index]))
-                                        # print("arr_grad[" + str(next_reversed_layer_index) +"][" + str(grad_node_index) +"] = " +str(arr_grad[next_reversed_layer_index][grad_node_index]))
-                                        sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
-                                        # print("sum = " + str(sum))
+                                for grad_output_index in range(0, len(arr_grad[next_reversed_layer_index])):
+                                    for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
+                                        for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
+                            
+                                            # print(arr_grad)
+                                            # print("weight = " +str(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index]))
+                                            # print("arr_grad[" + str(next_reversed_layer_index) + "] = " +str(arr_grad[next_reversed_layer_index]))
+                                            # print("arr_grad[" + str(next_reversed_layer_index) +"][" + str(grad_node_index) +"] = " +str(arr_grad[next_reversed_layer_index][grad_node_index]))
+                                            # if(weight_node_index == grad_node_index):
+                                            # print("arr_grad = " + str(arr_grad))
+                                            sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_output_index])
+                                            # sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
+                                            # print("sum = " + str(sum))
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                 # Input layer -> First Hidden layer 
                 else:
@@ -445,8 +452,9 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
         # weight at an input layer -> the first hidden layer
         elif(list_index == len(arr_hidden_layers) - 1):
             reversed_list_index = len(arr_hidden_layers) - list_index - 1
+            # print("arr_hidden_layers[reversed_list_index] = " + str(arr_hidden_layers[reversed_list_index]))
             for weight_node_index in range(0, len(arr_hidden_layers[reversed_list_index])):
-                for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_layer_index])):
+                for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_list_index][weight_node_index])):
                     result = 0
                     # for weight_to_node_index in range(0, len(arr_hidden_layers[reversed_layer_index][weight_layer_index][weight_node_index])):
                     # print("BEFORE UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
@@ -454,7 +462,8 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     result += arr_hidden_layers[0][weight_node_index][weight_to_node_index]
                     result += (float(momentum) * (arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] - \
                                 arr_hidden_layers[0][weight_node_index][weight_to_node_index]))
-                    result += (float(learning_rate) * arr_grad[0][0][weight_node_index] * arr_input_nodes_with_value[weight_node_index])
+                    # print("arr_input_nodes_with_value[weight_node_index] : " +str(arr_input_nodes_with_value[weight_to_node_index]))
+                    result += (float(learning_rate) * arr_grad[0][0][weight_node_index] * arr_input_nodes_with_value[weight_to_node_index])
                     arr_hidden_layers_new[0][weight_node_index][weight_to_node_index] = result
                     # print("AFTER UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
                     # "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]))
@@ -464,7 +473,8 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 result += arr_weight_bias[0][bias_node_index]
                 result += (float(momentum) * (arr_weight_bias_new[0][bias_node_index] - \
                             arr_weight_bias[0][bias_node_index]))
-                result += (float(learning_rate) * arr_grad[0][0][bias_node_index] * arr_input_nodes_with_value[bias_node_index])
+                if(bias_node_index < len(arr_input_nodes_with_value)):
+                    result += (float(learning_rate) * arr_grad[0][0][bias_node_index] * arr_input_nodes_with_value[bias_node_index])
                 arr_weight_bias_new[0][bias_node_index] = result
 
         # weight at hidden layer -> hidden layer
