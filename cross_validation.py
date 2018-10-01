@@ -337,9 +337,10 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                                     sum += weight * arr_grad[next_reversed_layer_index]
                                 else:
                                     # print("arr_grad = " + str(arr_grad))
-                                    for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
-                                        for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
-                                            sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_node_index])
+                                    for grad_output_index in range(0, len(arr_grad[next_reversed_layer_index])):
+                                        for weight_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1])):
+                                            for weight_to_node_index in range(0, len(arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index])):
+                                                sum += (arr_hidden_layers[len(arr_hidden_layers) - 1][weight_node_index][weight_to_node_index] * arr_grad[next_reversed_layer_index][grad_output_index])
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
                     elif(function_number == "2"):
                         for grad_node_index in range(0, len(arr_grad[reversed_layer_index][reversed_grad_layer_index])):
@@ -399,8 +400,9 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                                         # print("arr_grad[" + str(reversed_layer_index) + "][" + str(reversed_grad_layer_index + 1) + "][" + str(grad_node_index) + "]")
                         arr_grad[reversed_layer_index][reversed_grad_layer_index][grad_node_index] += sum
     # calculate update weight
+    print("BEFORE -> arr_hidden_layers : " + str(arr_hidden_layers))
     for list_index in range(0, len(arr_hidden_layers)):
-        # weight at the last hidden layer -> output layer
+        # weight at the last hidden layer -> output layer 
         if(list_index == 0):
             reversed_list_index = len(arr_hidden_layers) - list_index - 1
             for weight_layer_index in range(0, len(arr_hidden_layers[reversed_list_index])):
@@ -417,7 +419,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     else:
                         for grad_node_index in range(0, len(arr_grad[1])):
                             if(weight_node_index == grad_node_index):
-                                print("arr_grad[1][grad_node_index] = " +str(arr_grad[1][grad_node_index]) )
+                                # print("arr_grad[1][grad_node_index] = " +str(arr_grad[1][grad_node_index]) )
                                 result += (float(learning_rate) * arr_grad[1][grad_node_index] * arr_Y[len(arr_Y) - 1][grad_node_index])                
                                 result = round(result,8)
                     # #update weight
@@ -468,6 +470,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     # print("AFTER UPDATE -> arr_hidden_layers_new[0]["+str(weight_node_index) + "][" + str(weight_to_node_index) + \
                     # "] = " + str(arr_hidden_layers_new[0][weight_node_index][weight_to_node_index]))
             # update weight bias
+            # print("BEFORE -> arr_weight_bias[0]  = " + str(arr_weight_bias[0]))
             for bias_node_index in range(0, len(arr_weight_bias[0])):
                 result = 0
                 result += arr_weight_bias[0][bias_node_index]
@@ -476,6 +479,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                 if(bias_node_index < len(arr_input_nodes_with_value)):
                     result += (float(learning_rate) * arr_grad[0][0][bias_node_index] * arr_input_nodes_with_value[bias_node_index])
                 arr_weight_bias_new[0][bias_node_index] = result
+            # print("AFER -> arr_weight_bias[0]  = "+ str(arr_weight_bias[0]))
 
         # weight at hidden layer -> hidden layer
         else:
@@ -501,7 +505,7 @@ def backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_ne
                     result += (float(momentum) * (arr_weight_bias_new[bias_layer_index][bias_node_index] - arr_weight_bias[bias_layer_index][bias_node_index]))
                     result += (float(learning_rate) * arr_grad[0][bias_layer_index - 1][bias_node_index])
                     arr_weight_bias[bias_layer_index][bias_node_index] = result
-                                    
+    print("AFTER -> arr_hideen_layers_new : " +str(arr_hidden_layers_new) )                           
     # print("AFTER.......")
     # print("arr_Y : " + str(arr_Y))
     # print("arr_output_merged" + str(arr_output_merged))
@@ -564,15 +568,18 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                         # print("*****************************************************************************************************")
                         # print("                                           BACKWARD                                                   ")
                         # print("*****************************************************************************************************")
-                        arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers_new)
-                        arr_weight_bias_output_template = copy.deepcopy(arr_weight_bias_output_new)
-                        arr_weight_bias_template = copy.deepcopy(arr_weight_bias_new)
+                        # arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers_new)
+                        # arr_weight_bias_output_template = copy.deepcopy(arr_weight_bias_output_new)
+                        # arr_weight_bias_template = copy.deepcopy(arr_weight_bias_new)
                         # print("arr_hidden_layers_template = ")
                         # print("arr_hidden_layers = ")
                         # print(str(arr_hidden_layers))
                         # print(str(arr_hidden_layers_template))
                         backward(arr_input_nodes_with_value, arr_hidden_layers, arr_hidden_layers_new, arr_grad_hidden, arr_grad_output, arr_Y, arr_output_nodes, arr_error, function_number, \
                         momentum, learning_rate, number_of_classes, arr_weight_bias, arr_weight_bias_output, arr_weight_bias_new, arr_weight_bias_output_new)
+                        arr_hidden_layers_template = copy.deepcopy(arr_hidden_layers)
+                        arr_weight_bias_output_template = copy.deepcopy(arr_weight_bias_output)
+                        arr_weight_bias_template = copy.deepcopy(arr_weight_bias)
                         arr_hidden_layers = copy.deepcopy(arr_hidden_layers_template)
                         arr_weight_bias_output = copy.deepcopy(arr_weight_bias_output_template)
                         arr_weight_bias = copy.deepcopy(arr_weight_bias_template)
@@ -601,6 +608,11 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("arr_Y : " + str(arr_Y))
                     # all_sse = []
                     all_sse = []
+                    # variable for counting value in confusion matrix
+                    count_ac = 0
+                    count_bc = 0
+                    count_ad = 0
+                    count_bd = 0
                     for test_element_index in range(0, len(test_part)):
                     # if (element_index < len(test_part)):
                         print("test_part[" + str(element_index) + "] = " +str(test_part[test_element_index]))
@@ -616,9 +628,49 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("all_sse : " + str(all_sse))
                     # print("number of all sse : " + str(len(all_sse)))
                     # print("sum sse : " + str(sum(all_sse)))
+
+                        # confusion matrix
+                        if (full_data_file == "cross-pat.csv"):
+                            # print("confusionnnnnn")
+                            desired_output = []
+                            desired_output.append(data_output_template[0])
+                            desired_output.append(data_output_template[1])
+                            print("desired_output : " + str(desired_output))
+                            # formatting output
+                            # print("predicted_output[0] = " + str(predicted_output[0]))
+                            # print("predicted_output[1] = " + str(predicted_output[1]))
+                            # print("desired_output[0] = " + str(desired_output[0]))
+                            # print("desired_output[1] = " + str(desired_output[1]))
+                            if(predicted_output[0] > predicted_output[1]):
+                                actual_output = [1,0]
+                            elif(predicted_output[0] < predicted_output[1]):
+                                actual_output = [0,1]
+                            print("actual output : " + str(actual_output))
+                            # check condition for confusion matrix
+                            if(actual_output == desired_output):
+                                if(desired_output == [0,1]):
+                                    print("test ac")
+                                    count_ac += 1
+                                elif(desired_output == [1,0]):
+                                    print("test bd")
+                                    count_bd += 1
+                            else:
+                                if(desired_output == [0,1]):
+                                    print("test ad")
+                                    count_ad += 1
+                                elif(desired_output == [1,0]):
+                                    print("test bc")
+                                    count_bc += 1
+                                    
+
                     mse = calcualteMSE(all_sse, len(test_part))
                     all_sse.clear()
                     all_mse.append(mse)
+                    if (full_data_file == "cross-pat.csv"):
+                        print("ac = " + str(count_ac))
+                        print("bc = " + str(count_bc))
+                        print("ad = " + str(count_ad))
+                        print("bd = " + str(count_bd))
                     print("MSE : " + str(mse))
                     # print("MSE (" + str(element_index) + ") : " + str(mse))
 
