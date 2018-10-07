@@ -7,6 +7,7 @@ import statistics
 import init_node as init
 import copy
 
+
 def readFile(file):
     data = pandas.read_csv(file)
     dataframe = pandas.DataFrame(data)
