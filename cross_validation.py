@@ -578,6 +578,10 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                 for element_index in range(0, len(data_chunk_input[train_element_index])):
                     # print("testtttt")
                     # all_sse = []
+                    count_AC = 0
+                    count_BC = 0 
+                    count_AD = 0
+                    count_BD = 0
                     for epoch_count in range(0, int(epoch)):
                         # print("*****************************************************************************************************")
                         # print("                                           FORWARD                                                   ")
@@ -625,82 +629,82 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("arr_output_nodes : " + str(arr_output_nodes))
                     # print("arr_Y : " + str(arr_Y))
                     # all_sse = []
-            all_sse = []
-            for test_element_index in range(0, len(test_part)):
-                desired_output = []
-            # if (element_index < len(test_part)):
-                print("test_part[" + str(test_element_index) + "] = " +str(test_part[test_element_index]))
-                arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, test_part[test_element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
-                arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                all_sse.append(sse)
-                print("Predicted : " + str(predicted_output))
-                # print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
-                if(number_of_classes == "1"):
-                    print("Desired Output:" + str(data_output_template[0]))
-                elif(number_of_classes == "2"):
-                    desired_output.append(data_output_template[0])
-                    desired_output.append(data_output_template[1])
-                    print("Desired Output:" + str(data_output_template[0]) + "  " + str(data_output_template[1]))
-                    print("Desired Output:" + str(desired_output))
+                    all_sse = []
+                    for test_element_index in range(0, len(test_part)):
+                        desired_output = []
+                    # if (element_index < len(test_part)):
+                        print("test_part[" + str(test_element_index) + "] = " +str(test_part[test_element_index]))
+                        arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, test_part[test_element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                        arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
+                        all_sse.append(sse)
+                        print("Predicted : " + str(predicted_output))
+                        # print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
+                        if(number_of_classes == "1"):
+                            print("Desired Output:" + str(data_output_template[0]))
+                        elif(number_of_classes == "2"):
+                            desired_output.append(data_output_template[0])
+                            desired_output.append(data_output_template[1])
+                            print("Desired Output:" + str(data_output_template[0]) + "  " + str(data_output_template[1]))
+                            print("Desired Output:" + str(desired_output))
 
-                if(input_file == "cross-pat-input.csv"):
-                    # format output
-                    if(predicted_output[0] > predicted_output[1]):
-                        output = [1,0]
-                    elif(predicted_output[0] < predicted_output[1]):
-                        output = [0,1]
-                    # check condition
-                    if(output == desired_output):
-                        if(desired_output == [0,1]):
-                            count_AC += 1
-                        elif(desired_output == [1,0]):
-                            count_BD += 1
-                    else:
-                        if(desired_output == [0,1]):
-                            count_BC += 1
-                        elif(desired_output == [1,0]):
-                            count_AD += 1
+                        if(input_file == "cross-pat-input.csv"):
+                            # format output
+                            if(predicted_output[0] > predicted_output[1]):
+                                output = [1,0]
+                            elif(predicted_output[0] < predicted_output[1]):
+                                output = [0,1]
+                            # check condition
+                            if(output == desired_output):
+                                if(desired_output == [0,1]):
+                                    count_AC += 1
+                                elif(desired_output == [1,0]):
+                                    count_BD += 1
+                            else:
+                                if(desired_output == [0,1]):
+                                    count_BC += 1
+                                elif(desired_output == [1,0]):
+                                    count_AD += 1
 
-            # print("all_sse : " + str(all_sse))
-            # print("number of all sse : " + str(len(all_sse)))
-            # print("sum sse : " + str(sum(all_sse)))
-            mse = calcualteMSE(all_sse, len(test_part))
-            all_sse.clear()
-            all_mse.append(mse)
-            print("MSE : " + str(mse))
-            print()
-            if(input_file == "cross-pat-input.csv"):
-                print("-------------------------------------------- CONFUSION MATRIX -----------------------------------------")
-                print("| Desire Output | -------------------------- Predicted Output -----------------------------------------")
-                print("|               |            (0,1)                                               (1,0)                 ")
-                print("|    (0,1)      |           " + str(count_AC) + "                                   " + str(count_BC) + "            ")
-                print("|    (1,0)      |           " + str(count_AD) + "                                   " + str(count_BD) + "            ")
-                print("--------------------------------------------------------------------------------------------------------")
-                accuracy = ((count_AC + count_BD)/(count_AC + count_AD + count_BC + count_BD)) * 100
-                print("                                          ACCURACY = " + str(accuracy) + " %                                  ")
-                all_accuracy.append(accuracy)
-            # print("MSE (" + str(element_index) + ") : " + str(mse))
+                    # print("all_sse : " + str(all_sse))
+                    # print("number of all sse : " + str(len(all_sse)))
+                    # print("sum sse : " + str(sum(all_sse)))
+                    mse = calcualteMSE(all_sse, len(test_part))
+                    all_sse.clear()
+                    all_mse.append(mse)
+                    print("MSE : " + str(mse))
+                    print()
+                    if(input_file == "cross-pat-input.csv"):
+                        print("-------------------------------------------- CONFUSION MATRIX -----------------------------------------")
+                        print("| Desire Output | -------------------------- Predicted Output -----------------------------------------")
+                        print("|               |            (0,1)                                               (1,0)                 ")
+                        print("|    (0,1)      |           " + str(count_AC) + "                                   " + str(count_BC) + "            ")
+                        print("|    (1,0)      |           " + str(count_AD) + "                                   " + str(count_BD) + "            ")
+                        print("--------------------------------------------------------------------------------------------------------")
+                        accuracy = ((count_AC + count_BD)/(count_AC + count_AD + count_BC + count_BD)) * 100
+                        print("                                          ACCURACY = " + str(accuracy) + " %                                  ")
+                        all_accuracy.append(accuracy)
+                    # print("MSE (" + str(element_index) + ") : " + str(mse))
 
-            # #reset weight
-            arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
-            arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
-            arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
-            arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
-            arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
-            arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
-            #reset arr_Y
-            for layer_index in range(0, len(arr_Y)):
-                for node_index in range(0,len(arr_Y[layer_index])):
-                    arr_Y[layer_index][node_index] = 0
-            # print("arr_Y after reset: " + str(arr_Y))
+                    # #reset weight
+                    arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
+                    arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
+                    arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
+                    arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
+                    arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
+                    arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
+                    #reset arr_Y
+                    for layer_index in range(0, len(arr_Y)):
+                        for node_index in range(0,len(arr_Y[layer_index])):
+                            arr_Y[layer_index][node_index] = 0
+                    # print("arr_Y after reset: " + str(arr_Y))
 
-            #reset arr_output_nodes
-            for node_index in range(0, len(arr_output_nodes)):
-                arr_output_nodes[node_index] = 0
+                    #reset arr_output_nodes
+                    for node_index in range(0, len(arr_output_nodes)):
+                        arr_output_nodes[node_index] = 0
 
-            # print("arr_output_nodes after reset : " + str(arr_output_nodes))
-            print("------------------------------------------------------------------------------------------------------")
-            desired_output.clear()
+                    # print("arr_output_nodes after reset : " + str(arr_output_nodes))
+                    print("------------------------------------------------------------------------------------------------------")
+                    desired_output.clear()
         # print("Number of test data : " + str(len(test_part)))
         # print("all_sse : " + str(len(all_sse)))
         # mse = calcualteMSE(all_sse, len(test_part))
