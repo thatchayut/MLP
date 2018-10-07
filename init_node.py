@@ -35,7 +35,6 @@ def createHiddenLayers(number_of_features,number_of_layers,number_of_nodes,numbe
         node.clear()
     final.append(layer)
 
-    # final.append(layer)
     #The last hidden layer connected to an output layer
     count = 0
     while count < int(number_of_nodes):
@@ -57,16 +56,11 @@ def createBias(number_of_nodes,number_of_layers):
     for layer_count in range(0,int(number_of_layers)):
         arr = np.random.uniform(low=-1.0,high=1.0,size=int(number_of_nodes))
         weight_bias.append(arr)
-    # weight_bias.append(layer1)
 
     #initial bias as 1
     for layer_count in range(0,int(number_of_layers)):
         arr = np.ones(int(number_of_nodes))
         bias.append(arr)
-    # bias.append(layer2)  
-    # print(weight_bias)
-    # print()
-    # print(bias)
     return weight_bias, bias
 
 
@@ -77,7 +71,6 @@ def createY(number_of_nodes, number_of_layers):
     for layer_count in range(0, int(number_of_layers)):
         arr = np.zeros(int(number_of_nodes))
         layer.append(arr)
-    # final.append(layer)
     return layer 
 
 def createLocalGradOutput(number_of_classes):
@@ -87,9 +80,7 @@ def createLocalGradOutput(number_of_classes):
 def createLocalGradHidden(number_of_nodes, number_of_layers):
     node = []
     arr_grad_hidden = []
-    # final = []
     for layer_count in range(0, int(number_of_layers)):
         arr = np.zeros(int(number_of_nodes))
         arr_grad_hidden.append(arr)
-    # final.append(layer)
     return arr_grad_hidden 
