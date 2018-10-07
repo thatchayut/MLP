@@ -132,7 +132,20 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
     data_output_template = copy.deepcopy(data_output)
     # print(data_output)
     # data_output = featureScaling(data_output)
-    data_input, data_output = featureScaling(data_input, data_output)
+
+    check_input = True
+    check_output = True
+    for element in data_input:
+        if((element < -1) or (element  > 1)):
+            check_input = False
+            break
+    for element in data_output:
+        if((element < -1) or (element  > 1)):
+            check_output = False
+            break   
+
+    if((check_input == False) and (check_output == False)):
+        data_input, data_output = featureScaling(data_input, data_output)
     # print(len(data_input))
 
     # check if input nodes are enough
@@ -252,28 +265,35 @@ def forward (dataframe_input, dataframe_output, data_all, line, arr_input_nodes,
         # print("arr_Y" + str(arr_Y))
         # print("arr_output_nodes(actual output) : " + str(arr_output_nodes))
         # print("data output(desired output)  : " + str(data_output))
-        converted_arr_output_node = []
-        for element_index in range(0, len(arr_output_nodes)):
-            converted_value = convertBack(arr_output_nodes[element_index], data_input_template, data_output_template)
-            converted_arr_output_node.append(converted_value)
-        # print("actual output : " + str(converted_arr_output_node))
-        # print("desired output : " + str(data_output_template) )
+        if((check_input == False) and (check_output == False)):
+            converted_arr_output_node = []
+            for element_index in range(0, len(arr_output_nodes)):
+                converted_value = convertBack(arr_output_nodes[element_index], data_input_template, data_output_template)
+                converted_arr_output_node.append(converted_value)
+            # print("actual output : " + str(converted_arr_output_node))
+            # print("desired output : " + str(data_output_template) )
 
-        sse, arr_error = calculateError(converted_arr_output_node, data_output_template)
-        # print("SSE = " + str(sse))
-        # print("sse = " + str(sse))
-        predicted_output = copy.deepcopy(converted_arr_output_node)
-        converted_arr_output_node.clear()
-        
-        #normalize error
-        normalized_arr_error = []
-        for element_index in range(0, len(arr_error)):
-            error = normalizeError(arr_error[element_index], data_input_template, data_output_template)
-            normalized_arr_error.append(error)
+            sse, arr_error = calculateError(converted_arr_output_node, data_output_template)
+            # print("SSE = " + str(sse))
+            # print("sse = " + str(sse))
+            predicted_output = copy.deepcopy(converted_arr_output_node)
+            converted_arr_output_node.clear()
+            
+            #normalize error
+            normalized_arr_error = []
+            for element_index in range(0, len(arr_error)):
+                error = normalizeError(arr_error[element_index], data_input_template, data_output_template)
+                normalized_arr_error.append(error)
 
-        # sse, arr_error = calculateError(arr_output_nodes, data_output)
-        # return arr_input_nodes, sse, arr_error
-        return arr_input_nodes, sse, normalized_arr_error, predicted_output, data_output_template
+            # sse, arr_error = calculateError(arr_output_nodes, data_output)
+            # return arr_input_nodes, sse, arr_error
+            return arr_input_nodes, sse, normalized_arr_error, predicted_output, data_output_template
+        else:
+            sse, arr_error = calculateError(arr_output_nodes, data_output_template)
+            # print("SSE = " + str(sse))
+            # print("sse = " + str(sse))
+            predicted_output = copy.deepcopy(arr_output_nodes)
+            return arr_input_nodes, sse, arr_error, predicted_output, data_output_template
     else:
         print("cannot do FORWARDING!")
         print()
@@ -536,9 +556,14 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
     # print (len(data_chunk))
     # test and train
     count = 0
-    for test_element in data_chunk_input:
-        all_mse = []
+    all_mse = []
+    all_accuracy = []
+    for test_element in data_chunk_input:   
         # all_sse = []
+        count_AC = 0
+        count_BC = 0 
+        count_AD = 0
+        count_BD = 0
         count += 1
         print("------------------------------" + str(count) + " fold ------------------------------")
         test_part = test_element
@@ -600,54 +625,92 @@ def crossValidation(input_file, output_file, full_data_file, number_of_fold, arr
                     # print("arr_output_nodes : " + str(arr_output_nodes))
                     # print("arr_Y : " + str(arr_Y))
                     # all_sse = []
-                    all_sse = []
-                    for test_element_index in range(0, len(test_part)):
-                    # if (element_index < len(test_part)):
-                        print("test_part[" + str(element_index) + "] = " +str(test_part[test_element_index]))
-                        arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, test_part[test_element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
-                        arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
-                        all_sse.append(sse)
-                        print("Predicted : " + str(predicted_output))
-                        # print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
-                        if(number_of_classes == "1"):
-                            print("Desired Output:" + str(data_output_template[0]))
-                        elif(number_of_classes == "2"):
-                            print("Desired Output:" + str(data_output_template[0]) + "  " + str(data_output_template[1]))
-                    # print("all_sse : " + str(all_sse))
-                    # print("number of all sse : " + str(len(all_sse)))
-                    # print("sum sse : " + str(sum(all_sse)))
-                    mse = calcualteMSE(all_sse, len(test_part))
-                    all_sse.clear()
-                    all_mse.append(mse)
-                    print("MSE : " + str(mse))
-                    # print("MSE (" + str(element_index) + ") : " + str(mse))
+            all_sse = []
+            for test_element_index in range(0, len(test_part)):
+                desired_output = []
+            # if (element_index < len(test_part)):
+                print("test_part[" + str(test_element_index) + "] = " +str(test_part[test_element_index]))
+                arr_input_nodes_with_value, sse, arr_error, predicted_output, data_output_template = forward(dataframe_input, dataframe_output, data_all, test_part[test_element_index], arr_input_nodes, arr_output_nodes, arr_Y, \
+                arr_hidden_layers_new, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function_number, beta, number_of_classes)
+                all_sse.append(sse)
+                print("Predicted : " + str(predicted_output))
+                # print("Desired Output : " + str(data_output_template.iloc[0:int(number_of_classes)].to_string(header=None,index=False)))
+                if(number_of_classes == "1"):
+                    print("Desired Output:" + str(data_output_template[0]))
+                elif(number_of_classes == "2"):
+                    desired_output.append(data_output_template[0])
+                    desired_output.append(data_output_template[1])
+                    print("Desired Output:" + str(data_output_template[0]) + "  " + str(data_output_template[1]))
+                    print("Desired Output:" + str(desired_output))
 
-                    # #reset weight
-                    arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
-                    arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
-                    arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
-                    arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
-                    arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
-                    arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
-                    #reset arr_Y
-                    for layer_index in range(0, len(arr_Y)):
-                        for node_index in range(0,len(arr_Y[layer_index])):
-                            arr_Y[layer_index][node_index] = 0
-                    # print("arr_Y after reset: " + str(arr_Y))
+                if(input_file == "cross-pat-input.csv"):
+                    # format output
+                    if(predicted_output[0] > predicted_output[1]):
+                        output = [1,0]
+                    elif(predicted_output[0] < predicted_output[1]):
+                        output = [0,1]
+                    # check condition
+                    if(output == desired_output):
+                        if(desired_output == [0,1]):
+                            count_AC += 1
+                        elif(desired_output == [1,0]):
+                            count_BD += 1
+                    else:
+                        if(desired_output == [0,1]):
+                            count_BC += 1
+                        elif(desired_output == [1,0]):
+                            count_AD += 1
 
-                    #reset arr_output_nodes
-                    for node_index in range(0, len(arr_output_nodes)):
-                        arr_output_nodes[node_index] = 0
+            # print("all_sse : " + str(all_sse))
+            # print("number of all sse : " + str(len(all_sse)))
+            # print("sum sse : " + str(sum(all_sse)))
+            mse = calcualteMSE(all_sse, len(test_part))
+            all_sse.clear()
+            all_mse.append(mse)
+            print("MSE : " + str(mse))
+            print()
+            if(input_file == "cross-pat-input.csv"):
+                print("-------------------------------------------- CONFUSION MATRIX -----------------------------------------")
+                print("| Desire Output | -------------------------- Predicted Output -----------------------------------------")
+                print("|               |            (0,1)                                               (1,0)                 ")
+                print("|    (0,1)      |           " + str(count_AC) + "                                   " + str(count_BC) + "            ")
+                print("|    (1,0)      |           " + str(count_AD) + "                                   " + str(count_BD) + "            ")
+                print("--------------------------------------------------------------------------------------------------------")
+                accuracy = ((count_AC + count_BD)/(count_AC + count_AD + count_BC + count_BD)) * 100
+                print("                                          ACCURACY = " + str(accuracy) + " %                                  ")
+                all_accuracy.append(accuracy)
+            # print("MSE (" + str(element_index) + ") : " + str(mse))
 
-                    # print("arr_output_nodes after reset : " + str(arr_output_nodes))
-                    print("------------------------------------------------------------------------------------------------------")
+            # #reset weight
+            arr_hidden_layers = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes) 
+            arr_hidden_layers_new = init.createHiddenLayers(number_of_features, number_of_layers, number_of_nodes, number_of_classes)
+            arr_weight_bias, arr_bias = init.createBias(number_of_nodes, number_of_layers)
+            arr_weight_bias_new, arr_bias_output_new = init.createBias(number_of_nodes, number_of_layers)
+            arr_weight_bias_output, arr_bias_output  =init.createBias(number_of_classes, 1)
+            arr_weight_bias_output_new, arr_bias_output_new  =init.createBias(number_of_classes, 1)
+            #reset arr_Y
+            for layer_index in range(0, len(arr_Y)):
+                for node_index in range(0,len(arr_Y[layer_index])):
+                    arr_Y[layer_index][node_index] = 0
+            # print("arr_Y after reset: " + str(arr_Y))
+
+            #reset arr_output_nodes
+            for node_index in range(0, len(arr_output_nodes)):
+                arr_output_nodes[node_index] = 0
+
+            # print("arr_output_nodes after reset : " + str(arr_output_nodes))
+            print("------------------------------------------------------------------------------------------------------")
+            desired_output.clear()
         # print("Number of test data : " + str(len(test_part)))
         # print("all_sse : " + str(len(all_sse)))
         # mse = calcualteMSE(all_sse, len(test_part))
         # print("MSE = " + str(mse))
-        print("Minimum MSE : " + str(min(all_mse)))      
-        print()
-        print()
+    print("Minimum MSE : " + str(min(all_mse)))    
+    print("Average MSE : " + str(sum(all_mse)/len(all_mse)))  
+    if(input_file == "cross-pat-input.csv"):
+        print("Average accuracy = " + str((sum(all_accuracy)/len(all_accuracy))))
+    print()
+    print()
                 # mse = calcualteMSE(all_sse, number_of_data_all)
                 # print("MSE : " + str(mse))
                 # print("arr_hidden_layers : ")

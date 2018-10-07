@@ -71,7 +71,11 @@ def main():
     arr_weight_bias_output_template, arr_bias_output_template  =init.createBias(number_of_classes, 1)
     arr_grad_output = init.createLocalGradOutput(number_of_classes)
     arr_grad_hidden = init.createLocalGradHidden(number_of_nodes, number_of_layers)
-    cv.crossValidation("flood-input.csv", "flood-output.csv", "flood-data.csv", fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
+
+    input_file = "cross-pat-input.csv"
+    output_file = "cross-pat-output.csv"
+    data_file = "cross-pat.csv"
+    cv.crossValidation(input_file, output_file, data_file, fold, arr_input_nodes, arr_hidden_layers, arr_hidden_layers_new, arr_hidden_layers_template, \
                           arr_Y, arr_output_nodes, arr_weight_bias, arr_bias, arr_weight_bias_output, arr_bias_output, function, momentum, learning_rate, beta, arr_grad_hidden, arr_grad_output,\
                           number_of_features, number_of_layers, number_of_nodes, number_of_classes, epoch, arr_weight_bias_template, arr_weight_bias_output_template,  arr_weight_bias_new, \
                           arr_weight_bias_output_new)
